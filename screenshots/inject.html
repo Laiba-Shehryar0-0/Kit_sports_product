@@ -1,0 +1,8 @@
+﻿<!DOCTYPE html>
+<html><head><script>
+var users = [{id:1,name:"Ahmed Khan",email:"ahmed@example.com",password:"test123",avatar:"A"}];
+localStorage.setItem("kws_users", JSON.stringify(users));
+var safe = {id:1,name:"Ahmed Khan",email:"ahmed@example.com",avatar:"A"};
+localStorage.setItem("kws_user", JSON.stringify(safe));
+setTimeout(function(){ window.location.href="http://localhost:5173/"; },200);
+</script></head><body>Logging in...</body></html>

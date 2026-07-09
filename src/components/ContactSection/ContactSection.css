@@ -1,0 +1,176 @@
+.contact {
+  background: var(--bg-700);
+  padding: var(--space-24) 0;
+}
+
+.contact__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-12);
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: var(--space-12);
+  align-items: start;
+}
+
+/* Form */
+.contact__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.contact__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.contact__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.contact__field label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--light-500);
+}
+
+.contact__field label span {
+  color: var(--red);
+}
+
+.contact__field input,
+.contact__field select,
+.contact__field textarea {
+  background: var(--bg-600);
+  border: 1px solid var(--border-dark);
+  color: var(--light-100);
+  padding: 12px var(--space-4);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+.contact__field select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.contact__field select option {
+  background: var(--bg-600);
+  color: var(--light-100);
+}
+
+.contact__field input:focus,
+.contact__field select:focus,
+.contact__field textarea:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.12);
+}
+
+.contact__field input::placeholder,
+.contact__field textarea::placeholder {
+  color: var(--light-600);
+}
+
+.contact__field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contact__submit {
+  width: fit-content;
+  padding: 14px 40px;
+  border-radius: 7px;
+  background: #a00000;
+}
+
+.contact__submit:hover {
+  background: #880000;
+}
+
+.contact__error {
+  font-size: 0.78rem;
+  color: #ff5555;
+  margin-top: 4px;
+  display: block;
+}
+
+.contact__success {
+  font-size: 0.875rem;
+  color: #4caf50;
+  font-weight: 600;
+}
+
+/* Info panel */
+.contact__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.contact__info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  background: var(--bg-600);
+  border: 1px solid var(--border-dark);
+  padding: var(--space-5);
+}
+
+.contact__info-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.contact__info-card strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: var(--space-2);
+}
+
+.contact__info-card p {
+  font-size: 0.875rem;
+  color: var(--light-400);
+  line-height: 1.65;
+}
+
+.contact__whatsapp {
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 13px;
+  background: #0d5c2e;
+  color: #fff;
+}
+
+.contact__whatsapp:hover {
+  background: #0a4422;
+}
+
+/* ── Responsive ──────────────────── */
+@media (max-width: 900px) {
+  .contact__grid { grid-template-columns: 1fr; }
+  .contact__row  { grid-template-columns: 1fr; }
+}
