@@ -781,7 +781,7 @@ function AssetsPanel({ design, patch, fileInputRef, onFile }) {
               className={`panel__badge-btn${design.logoPreset === b.id && !design.logoDataUrl ? ' panel__badge-btn--active' : ''}`}
               title={b.label}
             >
-              <img src={b.image} alt="" className="panel__badge-thumb" />
+              <img src={b.image} alt={b.label} className="panel__badge-thumb" />
               {b.label}
             </button>
           ))}
