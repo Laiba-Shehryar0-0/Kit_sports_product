@@ -45,7 +45,3 @@ src/
 ├── customize/      # Kit customization logic (SVG shapes, preview renderer)
 ├── pages/          # Route-level pages (Home, Kits, Customize, About)
 └── index.css       # Design system variables and utility classes
-License
-This project is currently unlicensed.
-
-
