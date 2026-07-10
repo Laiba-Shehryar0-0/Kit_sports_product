@@ -6,7 +6,9 @@ A React + Vite frontend for browsing, viewing, and customizing sports kits (jers
 
 - **Home** — Landing page with hero, stats, featured kits, sport categories, size guide, FAQ, and contact sections
 - **Kit Catalog** — Browse kits with sport filtering and search
-- **Kit Customizer** — Live SVG-based tool to customize color, design, and text on kits, with front/back preview and export
+- **Kit Customizer** — Live SVG-based tool to customize color, design, badge, and text on kits (jersey, polo, jumper, shorts, socks, cap), with front/back preview and export
+- **Checkout** — Order summary and payment method selection
+- **Auth** — Sign in / sign up modal
 - **About** — Company timeline, values, and mission
 
 ## Tech Stack

@@ -3,16 +3,85 @@ import { useNavigate } from 'react-router-dom';
 import KitPreview from '../customize/KitPreview';
 import {
   KIT_TYPES, SPORTS, SIZES, COLOR_PALETTE, APPLY_TARGETS,
-  FONTS, DESIGN_TEMPLATES, BADGE_PRESETS, POSITIONS, getKitPath,
+  FONTS, DESIGN_TEMPLATES, BADGE_PRESETS, POSITIONS,
   DESIGN_STORAGE_KEY, loadStoredDesign,
 } from '../customize/kitShapes';
 import {
   IconSelect, IconDraw, IconText, IconUndo, IconRedo, IconSave, IconExport,
   IconLayers, IconEye, IconEyeOff, IconGrip, IconUpload, IconPlus, IconMinus, IconPan,
-  IconKit, IconPalette, IconTag,
+  IconKit, IconPalette, IconTag, IconChevronLeft,
 } from '../customize/icons';
 import ColorPicker from '../customize/ColorPicker';
+import cricketShirtImg from '../assets/cricket-shirt.png';
+import cricketTrousersImg from '../assets/cricket-trousers.png';
+import cricketSweaterImg from '../assets/cricket-sweater.png';
+import cricketCapImg from '../assets/cricket-cap.png';
+import footballJerseyImg from '../assets/football-jersey.png';
+import footballShortsImg from '../assets/football-shorts.png';
+import goalkeeperKitImg from '../assets/goalkeeper-kit.png';
+import basketballJerseyImg from '../assets/Basketball-Jersey.png';
+import basketballShortsImg from '../assets/basketball-shorts.png';
+import basketballShoesImg from '../assets/basketball-shoes.png';
+import trainingTShirtImg from '../assets/training-T-shit.png';
+import trainingShortsImg from '../assets/training-shorts.png';
+import trainingVestImg from '../assets/Training-vest.png';
+import tracksuitImg from '../assets/tracksuit.png';
+import warmupSuitImg from '../assets/Warm-up-suit.png';
+import trainingBibImg from '../assets/Training-bib.png';
+import boxingKitImg from '../assets/boxing-kit.png';
+import hockeyKitImg from '../assets/hockey-kit.png';
+import cyclingKitImg from '../assets/cycling-kit.png';
+import rugbyKitImg from '../assets/rudby-kit.png';
 import './Customize.css';
+
+/** Sport → specific product catalog, each mapped to a KIT_TYPES id so the SVG preview knows what to render */
+const SPORT_KIT_GROUPS = [
+  {
+    id: 'cricket', label: 'Cricket',
+    items: [
+      { id: 'cricket-shirt',    label: 'Cricket Shirt',    image: cricketShirtImg,    kitType: 'polo' },
+      { id: 'cricket-trousers', label: 'Cricket Trousers', image: cricketTrousersImg, kitType: 'shorts' },
+      { id: 'cricket-sweater',  label: 'Cricket Sweater',  image: cricketSweaterImg,  kitType: 'jumper' },
+      { id: 'cricket-cap',      label: 'Cricket Cap',      image: cricketCapImg,      kitType: 'cap' },
+    ],
+  },
+  {
+    id: 'football', label: 'Football',
+    items: [
+      { id: 'football-jersey', label: 'Football Jersey', image: footballJerseyImg, kitType: 'jersey' },
+      { id: 'football-shorts', label: 'Football Shorts', image: footballShortsImg, kitType: 'shorts' },
+      { id: 'goalkeeper-kit',  label: 'Goalkeeper Kit',  image: goalkeeperKitImg,  kitType: 'jersey' },
+      { id: 'training-bib',    label: 'Training Bib',    image: trainingBibImg,    kitType: 'jersey' },
+    ],
+  },
+  {
+    id: 'basketball', label: 'Basketball',
+    items: [
+      { id: 'basketball-jersey', label: 'Basketball Jersey', image: basketballJerseyImg, kitType: 'jersey' },
+      { id: 'basketball-shorts', label: 'Basketball Shorts', image: basketballShortsImg, kitType: 'shorts' },
+      { id: 'basketball-shoes',  label: 'Basketball Shoes',  image: basketballShoesImg,  kitType: 'socks' },
+      { id: 'warmup-suit',       label: 'Warm-up Suit',      image: warmupSuitImg,       kitType: 'jumper' },
+    ],
+  },
+  {
+    id: 'training', label: 'Training',
+    items: [
+      { id: 'training-tshirt', label: 'Training T-Shirt', image: trainingTShirtImg, kitType: 'jersey' },
+      { id: 'training-shorts', label: 'Training Shorts',  image: trainingShortsImg, kitType: 'shorts' },
+      { id: 'training-vest',   label: 'Training Vest',    image: trainingVestImg,   kitType: 'jersey' },
+      { id: 'tracksuit',       label: 'Tracksuit',        image: tracksuitImg,      kitType: 'jumper' },
+    ],
+  },
+  {
+    id: 'others', label: 'Others',
+    items: [
+      { id: 'boxing-kit',  label: 'Boxing Kit',  image: boxingKitImg,  kitType: 'shorts' },
+      { id: 'hockey-kit',  label: 'Hockey Kit',  image: hockeyKitImg,  kitType: 'jersey' },
+      { id: 'cycling-kit', label: 'Cycling Kit', image: cyclingKitImg, kitType: 'jersey' },
+      { id: 'rugby-kit',   label: 'Rugby Kit',   image: rugbyKitImg,   kitType: 'jersey' },
+    ],
+  },
+];
 
 const TABS = [
   { id: 'kit',    label: 'Kit',    icon: <IconKit /> },
@@ -73,6 +142,7 @@ export default function Customize() {
   const [activeTool, setActiveTool] = useState('select');
   const [applyTarget, setApplyTarget] = useState('body');
   const [side, setSide] = useState('front');
+  const [railHidden, setRailHidden] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [toast, setToast] = useState('');
@@ -147,7 +217,7 @@ export default function Customize() {
   const handleSave = useCallback(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('kitlab_saved_designs') || '[]');
-      saved.push({ ...design, id: Date.now(), kitTypeLabel: KIT_TYPES.find(k => k.id === design.kitType)?.label });
+      saved.push({ ...design, id: Date.now(), kitTypeLabel: design.kitProduct || KIT_TYPES.find(k => k.id === design.kitType)?.label });
       localStorage.setItem('kitlab_saved_designs', JSON.stringify(saved));
     } catch { /* storage unavailable — ignore */ }
     setToast('Design saved');
@@ -179,13 +249,17 @@ export default function Customize() {
     navigate('/checkout');
   }, [design, navigate]);
 
-  const kitLabel = KIT_TYPES.find(k => k.id === design.kitType)?.label || 'Jersey';
+  const kitLabel = design.kitProduct || KIT_TYPES.find(k => k.id === design.kitType)?.label || 'Jersey';
 
   return (
     <div className="customizer">
       {/* ── Top toolbar ─────────────────────────────────────── */}
       <div className="customizer__topbar">
-        <div className="customizer__topbar-left" />
+        <div className="customizer__topbar-left">
+          <ToolBtn onClick={() => setRailHidden(v => !v)} title={railHidden ? 'Show tools' : 'Hide tools'}>
+            <IconChevronLeft style={{ transform: railHidden ? 'rotate(180deg)' : 'none' }} />
+          </ToolBtn>
+        </div>
 
         <div className="customizer__topbar-center">
           <div className="customizer__side-toggle">
@@ -207,15 +281,17 @@ export default function Customize() {
         </div>
       </div>
 
-      <div className="customizer__body">
+      <div className={`customizer__body${railHidden ? ' customizer__body--rail-hidden' : ''}`}>
         {/* ── Left icon rail ──────────────────────────────────── */}
-        <div className="customizer__rail">
-          <ToolBtn active={activeTool === 'select'} onClick={() => selectTool('select', 'kit')} title="Select — browse kit options"><IconSelect /></ToolBtn>
-          <ToolBtn active={activeTool === 'pan'} onClick={() => selectTool('pan')} title="Pan — drag the canvas to reposition"><IconPan /></ToolBtn>
-          <ToolBtn active={activeTool === 'draw'} onClick={() => selectTool('draw', 'colors')} title="Draw — edit kit colors"><IconDraw /></ToolBtn>
-          <ToolBtn active={activeTool === 'text'} onClick={() => selectTool('text', 'text')} title="Text — edit name & number"><IconText /></ToolBtn>
-          <ToolBtn active={activeTool === 'layers'} onClick={() => selectTool('layers', 'layers')} title="Layers — manage layer stack"><IconLayers /></ToolBtn>
-        </div>
+        {!railHidden && (
+          <div className="customizer__rail">
+            <ToolBtn active={activeTool === 'select'} onClick={() => selectTool('select', 'kit')} title="Select — browse kit options"><IconSelect /></ToolBtn>
+            <ToolBtn active={activeTool === 'pan'} onClick={() => selectTool('pan')} title="Pan — drag the canvas to reposition"><IconPan /></ToolBtn>
+            <ToolBtn active={activeTool === 'draw'} onClick={() => selectTool('draw', 'colors')} title="Draw — edit kit colors"><IconDraw /></ToolBtn>
+            <ToolBtn active={activeTool === 'text'} onClick={() => selectTool('text', 'text')} title="Text — edit name & number"><IconText /></ToolBtn>
+            <ToolBtn active={activeTool === 'layers'} onClick={() => selectTool('layers', 'layers')} title="Layers — manage layer stack"><IconLayers /></ToolBtn>
+          </div>
+        )}
 
         {/* ── Canvas ──────────────────────────────────────────── */}
         <main className="customizer__canvas">
@@ -346,40 +422,55 @@ function ToolBtn({ active, disabled, onClick, title, children }) {
   );
 }
 
-/* ── Mini garment glyph — reused as kit-type icon ──────────── */
-function MiniKitGlyph({ kitType }) {
-  const kit = getKitPath(kitType);
-  return (
-    <svg viewBox={kit.viewBox} className="panel__kit-glyph">
-      <path d={kit.body || kit.dome} fill="currentColor" opacity="0.9" />
-    </svg>
-  );
-}
-
 /* ── Kit Panel (Kit Type / Sport / Templates) ──────────────── */
 function KitPanel({ design, patch, patchOpacity }) {
+  const [expandedSport, setExpandedSport] = useState(null);
+  const activeGroup = SPORT_KIT_GROUPS.find(g => g.id === expandedSport);
+  const [showAllTemplates, setShowAllTemplates] = useState(false);
+  const visibleTemplates = showAllTemplates ? DESIGN_TEMPLATES : DESIGN_TEMPLATES.slice(0, 4);
+
   return (
     <div className="panel">
       <div className="panel__section">
         <h3 className="panel__label">Kit Type</h3>
-        <div className="panel__kit-grid">
-          {KIT_TYPES.map(k => (
-            <button
-              key={k.id}
-              onClick={() => patch({ kitType: k.id })}
-              className={`panel__kit-btn${design.kitType === k.id ? ' panel__kit-btn--active' : ''}`}
-            >
-              <MiniKitGlyph kitType={k.id} />
-              <span>{k.label}</span>
+
+        {!activeGroup ? (
+          <div className="panel__sport-grid">
+            {SPORT_KIT_GROUPS.map(g => (
+              <button
+                key={g.id}
+                onClick={() => setExpandedSport(g.id)}
+                className="panel__sport-btn"
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <button className="panel__sport-back" onClick={() => setExpandedSport(null)}>
+              ← {activeGroup.label}
             </button>
-          ))}
-        </div>
+            <div className="panel__kit-grid">
+              {activeGroup.items.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => patch({ kitType: item.kitType, kitProduct: item.label })}
+                  className={`panel__kit-btn${design.kitProduct === item.label ? ' panel__kit-btn--active' : ''}`}
+                >
+                  <img src={item.image} alt={item.label} className="panel__kit-thumb" />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="panel__section">
         <h3 className="panel__label">Templates</h3>
         <div className="panel__template-grid">
-          {DESIGN_TEMPLATES.map(t => (
+          {visibleTemplates.map(t => (
             <button
               key={t.id}
               onClick={() => patch({ template: t.id })}
@@ -390,6 +481,11 @@ function KitPanel({ design, patch, patchOpacity }) {
             </button>
           ))}
         </div>
+        {DESIGN_TEMPLATES.length > 4 && (
+          <button className="panel__more-btn" onClick={() => setShowAllTemplates(v => !v)}>
+            {showAllTemplates ? 'Show less' : 'More'}
+          </button>
+        )}
       </div>
 
       <div className="panel__section">
@@ -740,7 +836,7 @@ function LayersPanel({ design, toggleLayer, reorderLayers, dragLayerId, setDragL
       <div className="panel__section">
         <h3 className="panel__label">Design State</h3>
         <div className="panel__state-box">
-          <StateRow label="Kit" value={KIT_TYPES.find(k => k.id === design.kitType)?.label} />
+          <StateRow label="Kit" value={design.kitProduct || KIT_TYPES.find(k => k.id === design.kitType)?.label} />
           <StateRow label="Sport" value={SPORTS.find(s => s.id === design.sport)?.label} />
           <StateRow label="Template" value={DESIGN_TEMPLATES.find(t => t.id === design.template)?.name} />
           <StateRow label="Body" value={design.bodyColor} swatch={design.bodyColor} />

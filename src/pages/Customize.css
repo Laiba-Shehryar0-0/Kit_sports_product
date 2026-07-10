@@ -124,6 +124,10 @@
   min-height: 0;
 }
 
+.customizer__body--rail-hidden {
+  grid-template-columns: 1fr 340px;
+}
+
 /* ── Left tool rail ───────────────────────────────────────── */
 .customizer__rail {
   display: flex;
@@ -141,8 +145,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-5);
-  padding: var(--space-8);
+  gap: var(--space-4);
+  padding: var(--space-6);
   background:
     radial-gradient(circle at 50% 0%, rgba(245,166,35,0.06), transparent 55%),
     var(--bg-800);
@@ -155,7 +159,7 @@
 .customizer__canvas-card {
   position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 520px;
   aspect-ratio: 4 / 3.1;
   background: linear-gradient(160deg, #f7f7f5 0%, #eceae6 100%);
   border-radius: var(--radius-lg);
@@ -238,9 +242,11 @@
   padding: var(--space-3) var(--space-5);
   font-size: 12px;
   color: var(--light-500);
-  flex-wrap: wrap;
-  max-width: 480px;
-  width: 100%;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  max-width: 100%;
+  width: fit-content;
+  overflow-x: auto;
 }
 
 .customizer__info-bar strong { color: var(--light-300); }
@@ -359,11 +365,11 @@
   color: var(--light-600);
 }
 
-/* Kit type grid */
+/* Kit type grid — 2 per row, 2 rows for a 4-item product set */
 .panel__kit-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
 }
 
 .panel__kit-btn {
@@ -385,8 +391,7 @@
   transition: all 200ms ease;
 }
 
-.panel__kit-glyph { width: 26px; height: 26px; color: var(--light-400); }
-.panel__kit-btn--active .panel__kit-glyph { color: var(--gold); }
+.panel__kit-thumb { width: 42px; height: 42px; object-fit: contain; filter: brightness(0) invert(1); }
 
 .panel__kit-btn:hover {
   border-color: var(--light-400);
@@ -400,6 +405,50 @@
   color: var(--gold);
   background: rgba(245, 166, 35, 0.1);
 }
+
+/* Sport category grid — text-only boxes shown before a sport is picked */
+.panel__sport-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.panel__sport-btn {
+  padding: var(--space-4) var(--space-2);
+  background: var(--bg-600);
+  border: 1.5px solid var(--border-dark);
+  color: var(--light-500);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 200ms ease;
+}
+
+.panel__sport-btn:hover {
+  border-color: var(--gold);
+  color: var(--light-100);
+  background: var(--bg-500);
+  transform: translateY(-2px);
+}
+
+.panel__sport-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0 var(--space-2);
+}
+
+.panel__sport-back:hover { color: var(--light-100); }
 
 /* Sport pills / badge pills */
 .panel__pill-row {
@@ -495,6 +544,21 @@
 }
 
 .panel__template-thumb { width: 36px; height: 42px; border-radius: 3px; overflow: hidden; }
+
+.panel__more-btn {
+  display: block;
+  margin: var(--space-2) auto 0;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.panel__more-btn:hover { color: var(--gold); }
 
 /* Apply-to segmented control */
 .panel__segmented {

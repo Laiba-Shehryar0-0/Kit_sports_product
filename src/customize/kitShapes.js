@@ -121,6 +121,7 @@ export const PAYMENT_METHODS = [
 
 export const DEFAULT_DESIGN = {
   kitType: 'jersey',
+  kitProduct: null,
   sport: 'football',
   template: 'solid',
   size: 'M',
