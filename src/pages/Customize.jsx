@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import KitPreview from '../customize/KitPreview';
+import useHistoryState from '../hooks/useHistoryState';
 import {
   KIT_TYPES, SPORTS, SIZES, SIZE_UNITS, COLOR_PALETTE, APPLY_TARGETS,
   FONTS, DESIGN_TEMPLATES, BADGE_PRESETS, POSITIONS,
@@ -100,41 +101,6 @@ const DEFAULT_LAYER_ORDER = [
   { id: 'sleeves', label: 'Sleeve Color' },
   { id: 'body',    label: 'Body Base' },
 ];
-
-/* ── Undo/redo history hook ─────────────────────────────────── */
-function useHistoryState(initial) {
-  const [state, setState] = useState(() => ({
-    past: [],
-    present: typeof initial === 'function' ? initial() : initial,
-    future: [],
-  }));
-
-  const set = useCallback((updater) => {
-    setState(s => {
-      const next = typeof updater === 'function' ? updater(s.present) : updater;
-      if (next === s.present) return s;
-      return { past: [...s.past, s.present], present: next, future: [] };
-    });
-  }, []);
-
-  const undo = useCallback(() => {
-    setState(s => {
-      if (s.past.length === 0) return s;
-      const previous = s.past[s.past.length - 1];
-      return { past: s.past.slice(0, -1), present: previous, future: [s.present, ...s.future] };
-    });
-  }, []);
-
-  const redo = useCallback(() => {
-    setState(s => {
-      if (s.future.length === 0) return s;
-      const [next, ...rest] = s.future;
-      return { past: [...s.past, s.present], present: next, future: rest };
-    });
-  }, []);
-
-  return [state.present, set, { undo, redo, canUndo: state.past.length > 0, canRedo: state.future.length > 0 }];
-}
 
 export default function Customize() {
   const [design, setDesign, { undo, redo, canUndo, canRedo }] = useHistoryState(loadStoredDesign);

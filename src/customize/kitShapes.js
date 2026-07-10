@@ -160,6 +160,7 @@ export const DEFAULT_DESIGN = {
 
 export const DESIGN_STORAGE_KEY = 'kitlab_current_design';
 export const SAVED_DESIGNS_KEY = 'kitlab_saved_designs';
+export const DRAWN_LOGO_KEY = 'kitlab_drawn_logo';
 
 /** True once the user has saved a design or placed an order at least once */
 export function hasPickedDesign() {
