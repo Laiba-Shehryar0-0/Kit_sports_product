@@ -5,7 +5,7 @@ import useHistoryState from '../hooks/useHistoryState';
 import {
   KIT_TYPES, SPORTS, SIZES, SIZE_UNITS, COLOR_PALETTE, APPLY_TARGETS,
   FONTS, DESIGN_TEMPLATES, BADGE_PRESETS, POSITIONS,
-  DESIGN_STORAGE_KEY, SAVED_DESIGNS_KEY, loadStoredDesign,
+  DESIGN_STORAGE_KEY, SAVED_DESIGNS_KEY, DRAWN_LOGO_KEY, loadStoredDesign,
 } from '../customize/kitShapes';
 import {
   IconSelect, IconDraw, IconText, IconUndo, IconRedo, IconSave, IconExport,
@@ -611,7 +611,7 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
               key={c.hex}
               onClick={() => onColor(c.hex)}
               className={`panel__swatch${currentHex?.toLowerCase() === c.hex.toLowerCase() ? ' panel__swatch--active' : ''}`}
-              style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid #444' : 'none' }}
+              style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid var(--swatch-outline)' : 'none' }}
               title={c.name}
               aria-label={c.name}
             />
@@ -745,9 +745,36 @@ function PositionGrid({ value, onChange }) {
 /* ── Assets Panel ───────────────────────────────────────────── */
 function AssetsPanel({ design, patch, fileInputRef, onFile }) {
   const [dragOver, setDragOver] = useState(false);
+  const [drawnLogo, setDrawnLogo] = useState(null);
+
+  useEffect(() => {
+    try { setDrawnLogo(localStorage.getItem(DRAWN_LOGO_KEY)); } catch { /* storage unavailable */ }
+  }, []);
+
+  const useDrawnLogo = () => {
+    patch({ logoDataUrl: drawnLogo, logoPreset: null });
+    try { localStorage.removeItem(DRAWN_LOGO_KEY); } catch { /* storage unavailable */ }
+    setDrawnLogo(null);
+  };
 
   return (
     <div className="panel">
+      <div className="panel__section">
+        <h3 className="panel__label">Free Draw Studio</h3>
+        {drawnLogo && (
+          <div className="panel__drawn-logo">
+            <img src={drawnLogo} alt="Your drawing" />
+            <div>
+              <button className="btn btn-darkred" onClick={useDrawnLogo}>Use this drawing as logo</button>
+              <button className="panel__link-btn" onClick={() => { localStorage.removeItem(DRAWN_LOGO_KEY); setDrawnLogo(null); }}>Discard</button>
+            </div>
+          </div>
+        )}
+        <Link to="/draw-studio" className="btn btn-grey panel__draw-studio-link">
+          Draw your own logo →
+        </Link>
+      </div>
+
       <div className="panel__section">
         <h3 className="panel__label">Upload Logo / Badge</h3>
         <div

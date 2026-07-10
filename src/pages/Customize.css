@@ -911,6 +911,44 @@
   color: var(--bg-800);
 }
 
+/* Free Draw Studio handoff */
+.panel__draw-studio-link {
+  width: 100%;
+  justify-content: center;
+}
+
+.panel__drawn-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  background: var(--bg-600);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-md);
+}
+
+.panel__drawn-logo img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  background: var(--canvas-light);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.panel__drawn-logo > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.panel__drawn-logo .btn {
+  padding: 8px 14px;
+  font-size: 10.5px;
+}
+
 /* Dropzone */
 .panel__dropzone {
   display: flex;

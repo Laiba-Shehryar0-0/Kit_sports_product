@@ -51,6 +51,9 @@
   --charcoal: #222222;
   --silver:   #9e9e9e;
 
+  /* Outline drawn around a white/light color-swatch button so it stays visible on light UI */
+  --swatch-outline: #444444;
+
   /* Light "photo card" surface (SVG kit preview canvas background) */
   --canvas-light:      #f7f7f5;
   --canvas-light-dark: #eceae6;

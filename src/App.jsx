@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { hasPickedDesign } from './customize/kitShapes';
 import AuthModal  from './components/AuthModal/AuthModal';
@@ -11,6 +11,10 @@ import Customize  from './pages/Customize';
 import Checkout   from './pages/Checkout';
 import About      from './pages/About';
 import Contact    from './pages/Contact';
+
+// Lazy-loaded: pulls in fabric.js (~300KB), so it should only download when
+// someone actually opens the Draw Studio, not on every page visit.
+const DrawStudio = lazy(() => import('./pages/DrawStudio'));
 
 /** Guards /checkout: requires a signed-in user who has already picked/saved a design. */
 function CheckoutGuard() {
@@ -25,7 +29,7 @@ function CheckoutGuard() {
   return <Checkout />;
 }
 
-const IMMERSIVE_ROUTES = ['/customize', '/checkout'];
+const IMMERSIVE_ROUTES = ['/customize', '/checkout', '/draw-studio'];
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -50,6 +54,11 @@ export default function App() {
           <Route path="/"          element={<Home />} />
           <Route path="/kits"      element={<Kits />} />
           <Route path="/customize" element={<Customize />} />
+          <Route path="/draw-studio" element={
+            <Suspense fallback={<PageLoading />}>
+              <DrawStudio />
+            </Suspense>
+          } />
           <Route path="/checkout"  element={<CheckoutGuard />} />
           <Route path="/about"     element={<About />} />
           <Route path="/contact"   element={<Contact />} />
@@ -58,6 +67,24 @@ export default function App() {
         <AppFooter />
       </AuthProvider>
     </BrowserRouter>
+  );
+}
+
+function PageLoading() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: '72px',
+      background: 'var(--bg-800)',
+      color: 'var(--light-500)',
+      fontSize: '13px',
+      letterSpacing: '0.5px',
+    }}>
+      Loading Draw Studio…
+    </div>
   );
 }
 
