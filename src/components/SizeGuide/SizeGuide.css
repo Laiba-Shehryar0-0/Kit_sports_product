@@ -81,7 +81,7 @@
 
 /* Steps */
 .size-guide__measure-title {
-  color: #000 !important;
+  color: var(--black) !important;
 }
 
 .size-guide__steps {

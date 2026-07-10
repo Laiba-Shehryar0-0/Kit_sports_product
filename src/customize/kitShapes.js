@@ -24,6 +24,11 @@ export const SPORTS = [
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'Custom'];
 
+export const SIZE_UNITS = [
+  { id: 'in', label: 'inches' },
+  { id: 'cm', label: 'cm' },
+];
+
 export const COLOR_PALETTE = [
   { hex: '#CC0000', name: 'Red' },
   { hex: '#0033CC', name: 'Royal Blue' },
@@ -53,6 +58,12 @@ export const FONTS = [
   { id: 'Impact',      label: 'Impact' },
   { id: 'Georgia',     label: 'Serif' },
   { id: 'Courier New', label: 'Mono' },
+  { id: 'Oswald',       label: 'Oswald' },
+  { id: 'Anton',        label: 'Anton' },
+  { id: 'Montserrat',   label: 'Montserrat' },
+  { id: 'Teko',         label: 'Teko' },
+  { id: 'Russo One',    label: 'Russo' },
+  { id: 'Archivo Black', label: 'Archivo' },
 ];
 
 export const DESIGN_TEMPLATES = [
@@ -126,6 +137,7 @@ export const DEFAULT_DESIGN = {
   template: 'solid',
   size: 'M',
   customSize: '',
+  customSizeUnit: 'in',
   bodyColor: '#CC0000',
   sleeveColor: '#1a1a1a',
   numberColor: '#FFFFFF',
@@ -147,6 +159,18 @@ export const DEFAULT_DESIGN = {
 };
 
 export const DESIGN_STORAGE_KEY = 'kitlab_current_design';
+export const SAVED_DESIGNS_KEY = 'kitlab_saved_designs';
+
+/** True once the user has saved a design or placed an order at least once */
+export function hasPickedDesign() {
+  try {
+    if (localStorage.getItem(DESIGN_STORAGE_KEY)) return true;
+    const saved = JSON.parse(localStorage.getItem(SAVED_DESIGNS_KEY) || '[]');
+    return Array.isArray(saved) && saved.length > 0;
+  } catch {
+    return false;
+  }
+}
 
 /** Migrates a legacy position id (e.g. 'TL') to the {x,y} anchor shape; passes {x,y} values through untouched */
 function normalizePosition(value, fallback) {

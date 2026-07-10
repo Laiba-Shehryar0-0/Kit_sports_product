@@ -1,4 +1,12 @@
 .contact {
+  /* Component-local color tokens — one-off shades not part of the shared theme palette */
+  --contact-submit:       #a00000;
+  --contact-submit-hover: #880000;
+  --contact-error:        #ff5555;
+  --contact-success:      #4caf50;
+  --contact-whatsapp:       #0d5c2e;
+  --contact-whatsapp-hover: #0a4422;
+
   background: var(--bg-700);
   padding: var(--space-24) 0;
 }
@@ -81,7 +89,7 @@
 .contact__field select:focus,
 .contact__field textarea:focus {
   border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.12);
+  box-shadow: 0 0 0 3px rgba(var(--red-glow-rgb), 0.12);
 }
 
 .contact__field input::placeholder,
@@ -98,23 +106,23 @@
   width: fit-content;
   padding: 14px 40px;
   border-radius: 7px;
-  background: #a00000;
+  background: var(--contact-submit);
 }
 
 .contact__submit:hover {
-  background: #880000;
+  background: var(--contact-submit-hover);
 }
 
 .contact__error {
   font-size: 0.78rem;
-  color: #ff5555;
+  color: var(--contact-error);
   margin-top: 4px;
   display: block;
 }
 
 .contact__success {
   font-size: 0.875rem;
-  color: #4caf50;
+  color: var(--contact-success);
   font-weight: 600;
 }
 
@@ -161,12 +169,12 @@
   justify-content: center;
   padding: 14px;
   font-size: 13px;
-  background: #0d5c2e;
-  color: #fff;
+  background: var(--contact-whatsapp);
+  color: var(--light-100);
 }
 
 .contact__whatsapp:hover {
-  background: #0a4422;
+  background: var(--contact-whatsapp-hover);
 }
 
 /* ── Responsive ──────────────────── */

@@ -108,7 +108,7 @@ export default function ColorPicker({ value, onChange }) {
       <div
         ref={svRef}
         className="color-picker__sv"
-        style={{ background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent), ${pureHueHex}` }}
+        style={{ background: `linear-gradient(to top, var(--black), transparent), linear-gradient(to right, var(--light-100), transparent), ${pureHueHex}` }}
         onPointerDown={drag(updateFromSV)}
       >
         <div

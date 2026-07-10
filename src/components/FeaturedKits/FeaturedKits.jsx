@@ -17,6 +17,8 @@ const KITS = [
     desc: "Premium uniform with professional cut and breathable fabric.",
     color: "#8B6914",
     accent: "#F5A623",
+    tagBg: "#3d3000",
+    hoverRgb: "138, 112, 0",
   },
   {
     id: 2,
@@ -28,6 +30,8 @@ const KITS = [
     desc: "Professional football jersey with moisture-wicking technology.",
     color: "#1a4a1a",
     accent: "#4CAF50",
+    tagBg: "#0a2a0a",
+    hoverRgb: "26, 92, 26",
   },
   {
     id: 3,
@@ -39,6 +43,8 @@ const KITS = [
     desc: "High-performance basketball uniform with enhanced mobility.",
     color: "#1a2a4a",
     accent: "#2196F3",
+    tagBg: "#040f30",
+    hoverRgb: "10, 42, 106",
   },
   {
     id: 4,
@@ -50,6 +56,8 @@ const KITS = [
     desc: "Comfortable training wear perfect for practice sessions.",
     color: "#2a1a2a",
     accent: "#9C27B0",
+    tagBg: "#20003a",
+    hoverRgb: "74, 10, 106",
   },
 ];
 
@@ -100,6 +108,8 @@ function KitCard({ kit }) {
       style={{
         "--kit-color": kit.color,
         "--kit-accent": kit.accent,
+        "--kit-tag-bg": kit.tagBg,
+        "--kit-hover-rgb": kit.hoverRgb,
         textDecoration: "none",
       }}
     >

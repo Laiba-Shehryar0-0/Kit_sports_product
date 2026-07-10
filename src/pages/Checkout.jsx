@@ -54,6 +54,9 @@ export default function Checkout() {
   const kitLabel = KIT_TYPES.find(k => k.id === design.kitType)?.label || 'Jersey';
   const templateName = DESIGN_TEMPLATES.find(t => t.id === design.template)?.name || 'Solid';
   const sportLabel = SPORTS.find(s => s.id === design.sport)?.label || 'Football';
+  const sizeDisplay = design.size === 'Custom' && design.customSize
+    ? `${design.customSize} ${design.customSizeUnit || 'in'}`
+    : design.size;
   const unitPrice = BASE_PRICES[design.kitType] ?? 2800;
   const delivery = DELIVERY_METHODS.find(d => d.id === deliveryId) ?? DELIVERY_METHODS[0];
 
@@ -127,6 +130,7 @@ export default function Checkout() {
               </div>
               <div className="checkout__kit-facts">
                 <FactRow label="Kit Type" value={`${sportLabel} ${kitLabel}`} />
+                <FactRow label="Size" value={sizeDisplay} />
                 <FactRow label="Template" value={templateName} />
                 <FactRow label="Name / No." value={`${design.playerName || 'PLAYER'} / #${design.playerNumber || '—'}`} />
                 <FactRow label="Colors" value={
@@ -158,6 +162,9 @@ export default function Checkout() {
                 </select>
               </div>
             </div>
+            {primarySize === 'Custom' && (
+              <p className="checkout__hint">Custom size: <strong>{sizeDisplay}</strong> (as entered in the Studio)</p>
+            )}
             <p className="checkout__hint">For mixed sizes, note individual sizes in special instructions. Minimum order: 5 kits.</p>
             <div className="checkout__preset-row">
               {QUANTITY_PRESETS.map(p => (
@@ -272,7 +279,7 @@ export default function Checkout() {
               <div>
                 <strong>{sportLabel} {kitLabel} Custom</strong>
                 <span>{templateName} Template</span>
-                <span>#{design.playerNumber || '—'} {(design.playerName || 'PLAYER').toUpperCase()} · Qty: {totalKits}</span>
+                <span>#{design.playerNumber || '—'} {(design.playerName || 'PLAYER').toUpperCase()} · Size: {sizeDisplay} · Qty: {totalKits}</span>
               </div>
             </div>
 
@@ -305,7 +312,7 @@ export default function Checkout() {
               <li><IconLock /> Secure encrypted payments</li>
             </ul>
 
-            <button onClick={handlePlaceOrder} className="btn btn-green checkout__place-order">
+            <button onClick={handlePlaceOrder} className="btn btn-darkred checkout__place-order">
               Place Order
             </button>
             <p className="checkout__terms">

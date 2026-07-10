@@ -30,7 +30,7 @@
   right: -10%;
   width: 50%;
   height: 140%;
-  background: linear-gradient(135deg, rgba(204,0,0,0.06) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(var(--red-glow-rgb),0.06) 0%, transparent 60%);
   clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
   pointer-events: none;
 }
@@ -68,7 +68,8 @@
 }
 
 .about-mission__stat {
-  background: #f0f0f0;
+  --stat-bg: #f0f0f0;
+  background: var(--stat-bg);
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
@@ -83,14 +84,14 @@
 
 .about-mission__stat:hover {
   transform: translateY(-5px);
-  background: #fff;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  background: var(--light-100);
+  box-shadow: 0 12px 32px rgba(var(--black-rgb), 0.12);
 }
 
 .about-mission__stat:nth-child(1) { border-top-color: var(--red); }
 .about-mission__stat:nth-child(2) { border-top-color: var(--gold); }
-.about-mission__stat:nth-child(3) { border-top-color: #222222; }
-.about-mission__stat:nth-child(4) { border-top-color: #9e9e9e; }
+.about-mission__stat:nth-child(3) { border-top-color: var(--charcoal); }
+.about-mission__stat:nth-child(4) { border-top-color: var(--silver); }
 
 .about-mission__stat-val {
   font-family: var(--font-display);

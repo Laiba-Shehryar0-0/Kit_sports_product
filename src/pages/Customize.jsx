@@ -2,9 +2,9 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import KitPreview from '../customize/KitPreview';
 import {
-  KIT_TYPES, SPORTS, SIZES, COLOR_PALETTE, APPLY_TARGETS,
+  KIT_TYPES, SPORTS, SIZES, SIZE_UNITS, COLOR_PALETTE, APPLY_TARGETS,
   FONTS, DESIGN_TEMPLATES, BADGE_PRESETS, POSITIONS,
-  DESIGN_STORAGE_KEY, loadStoredDesign,
+  DESIGN_STORAGE_KEY, SAVED_DESIGNS_KEY, loadStoredDesign,
 } from '../customize/kitShapes';
 import {
   IconSelect, IconDraw, IconText, IconUndo, IconRedo, IconSave, IconExport,
@@ -216,9 +216,9 @@ export default function Customize() {
 
   const handleSave = useCallback(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem('kitlab_saved_designs') || '[]');
+      const saved = JSON.parse(localStorage.getItem(SAVED_DESIGNS_KEY) || '[]');
       saved.push({ ...design, id: Date.now(), kitTypeLabel: design.kitProduct || KIT_TYPES.find(k => k.id === design.kitType)?.label });
-      localStorage.setItem('kitlab_saved_designs', JSON.stringify(saved));
+      localStorage.setItem(SAVED_DESIGNS_KEY, JSON.stringify(saved));
     } catch { /* storage unavailable — ignore */ }
     setToast('Design saved');
   }, [design]);
@@ -344,7 +344,7 @@ export default function Customize() {
             <span><strong>Kit:</strong> {kitLabel}</span>
             <span><strong>Sport:</strong> {SPORTS.find(s => s.id === design.sport)?.label}</span>
             <span><strong>Template:</strong> {DESIGN_TEMPLATES.find(t => t.id === design.template)?.name}</span>
-            <span><strong>Size:</strong> {design.size === 'Custom' && design.customSize ? design.customSize : design.size}</span>
+            <span><strong>Size:</strong> {design.size === 'Custom' && design.customSize ? `${design.customSize} ${design.customSizeUnit}` : design.size}</span>
             <span className="customizer__color-swatch" style={{ background: design.bodyColor }} title={`Body: ${design.bodyColor}`} />
             <span className="customizer__color-swatch" style={{ background: design.sleeveColor }} title={`Sleeves: ${design.sleeveColor}`} />
           </div>
@@ -367,7 +367,7 @@ export default function Customize() {
 
           <div className="customizer__panel">
             {activeTab === 'kit' && (
-              <KitPanel design={design} patch={patch} patchOpacity={patchOpacity} />
+              <KitPanel design={design} patch={patch} />
             )}
 
             {activeTab === 'colors' && (
@@ -423,7 +423,45 @@ function ToolBtn({ active, disabled, onClick, title, children }) {
 }
 
 /* ── Kit Panel (Kit Type / Sport / Templates) ──────────────── */
-function KitPanel({ design, patch, patchOpacity }) {
+/* ── Custom dropdown for size units — avoids the browser's native blue option highlight ── */
+function UnitDropdown({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const current = SIZE_UNITS.find(u => u.id === value);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDocClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [open]);
+
+  return (
+    <div className="panel__unit-dropdown" ref={ref}>
+      <button type="button" className="panel__unit-dropdown-btn" onClick={() => setOpen(v => !v)}>
+        {current?.label}
+        <IconChevronLeft style={{ transform: 'rotate(-90deg)', width: 12, height: 12 }} />
+      </button>
+      {open && (
+        <ul className="panel__unit-dropdown-list">
+          {SIZE_UNITS.map(u => (
+            <li key={u.id}>
+              <button
+                type="button"
+                onClick={() => { onChange(u.id); setOpen(false); }}
+                className={`panel__unit-dropdown-item${u.id === value ? ' panel__unit-dropdown-item--active' : ''}`}
+              >
+                {u.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function KitPanel({ design, patch }) {
   const [expandedSport, setExpandedSport] = useState(null);
   const activeGroup = SPORT_KIT_GROUPS.find(g => g.id === expandedSport);
   const [showAllTemplates, setShowAllTemplates] = useState(false);
@@ -489,31 +527,6 @@ function KitPanel({ design, patch, patchOpacity }) {
       </div>
 
       <div className="panel__section">
-        <h3 className="panel__label">Secondary Color</h3>
-        <div className="panel__palette">
-          {COLOR_PALETTE.map(c => (
-            <button
-              key={c.hex}
-              onClick={() => patch({ sleeveColor: c.hex })}
-              className={`panel__swatch${design.sleeveColor === c.hex ? ' panel__swatch--active' : ''}`}
-              style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid #444' : 'none' }}
-              title={c.name}
-              aria-label={c.name}
-            />
-          ))}
-        </div>
-        <ColorPicker value={design.sleeveColor} onChange={hex => patch({ sleeveColor: hex })} />
-        <div className="panel__slider-row">
-          <input
-            type="range" min="0" max="100" value={design.opacity.sleeves ?? 100}
-            onChange={e => patchOpacity('sleeves', Number(e.target.value))}
-            className="panel__slider"
-          />
-          <span className="panel__slider-value">{design.opacity.sleeves ?? 100}%</span>
-        </div>
-      </div>
-
-      <div className="panel__section">
         <h3 className="panel__label">Size</h3>
         <div className="panel__size-grid">
           {SIZES.map(s => (
@@ -527,13 +540,18 @@ function KitPanel({ design, patch, patchOpacity }) {
           ))}
         </div>
         {design.size === 'Custom' && (
-          <input
-            type="text"
-            className="panel__input"
-            placeholder="e.g. 44 chest, 3XL, or your own measurements"
-            value={design.customSize}
-            onChange={e => patch({ customSize: e.target.value })}
-          />
+          <>
+            <div className="panel__custom-size-row">
+              <input
+                type="text"
+                className="panel__input"
+                placeholder="e.g. 44 chest, or your own measurement"
+                value={design.customSize}
+                onChange={e => patch({ customSize: e.target.value })}
+              />
+              <UnitDropdown value={design.customSizeUnit} onChange={u => patch({ customSizeUnit: u })} />
+            </div>
+          </>
         )}
       </div>
     </div>
@@ -588,11 +606,14 @@ function TemplateThumb({ id, base = '#CC0000', accent = '#1a1a1a' }) {
 function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }) {
   const currentHex = design[TARGET_COLOR_KEY[applyTarget]];
   const currentOpacity = design.opacity[applyTarget] ?? 100;
+  const targetLabel = APPLY_TARGETS.find(t => t.id === applyTarget)?.label;
+  const presetName = COLOR_PALETTE.find(c => c.hex.toLowerCase() === currentHex?.toLowerCase())?.name || 'Custom';
 
   return (
     <div className="panel">
       <div className="panel__section">
         <h3 className="panel__label">Apply To</h3>
+        <p className="panel__hint">Pick a part of the kit, then choose its color below.</p>
         <div className="panel__segmented">
           {APPLY_TARGETS.map(t => (
             <button
@@ -607,13 +628,23 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
       </div>
 
       <div className="panel__section">
-        <h3 className="panel__label">Kit Presets</h3>
+        <div className="panel__color-preview">
+          <span className="panel__color-preview-swatch" style={{ background: currentHex }} />
+          <div>
+            <div className="panel__color-preview-title">{targetLabel} — {presetName}</div>
+            <div className="panel__color-preview-hex">{currentHex?.toUpperCase()}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="panel__section">
+        <h3 className="panel__label">Preset Colors</h3>
         <div className="panel__palette">
           {COLOR_PALETTE.map(c => (
             <button
               key={c.hex}
               onClick={() => onColor(c.hex)}
-              className={`panel__swatch${currentHex === c.hex ? ' panel__swatch--active' : ''}`}
+              className={`panel__swatch${currentHex?.toLowerCase() === c.hex.toLowerCase() ? ' panel__swatch--active' : ''}`}
               style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid #444' : 'none' }}
               title={c.name}
               aria-label={c.name}
@@ -644,6 +675,9 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
 
 /* ── Text Panel ─────────────────────────────────────────────── */
 function TextPanel({ design, patch }) {
+  const [showAllFonts, setShowAllFonts] = useState(false);
+  const visibleFonts = showAllFonts ? FONTS : FONTS.slice(0, 4);
+
   return (
     <div className="panel">
       <div className="panel__section">
@@ -665,7 +699,7 @@ function TextPanel({ design, patch }) {
       <div className="panel__section">
         <h3 className="panel__label">Font Style</h3>
         <div className="panel__font-grid">
-          {FONTS.map(f => (
+          {visibleFonts.map(f => (
             <button
               key={f.id}
               onClick={() => patch({ font: f.id })}
@@ -676,6 +710,11 @@ function TextPanel({ design, patch }) {
             </button>
           ))}
         </div>
+        {FONTS.length > 4 && (
+          <button className="panel__more-btn" onClick={() => setShowAllFonts(v => !v)}>
+            {showAllFonts ? 'Show less' : 'More'}
+          </button>
+        )}
       </div>
 
       <div className="panel__section">

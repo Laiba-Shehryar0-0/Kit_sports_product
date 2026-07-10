@@ -46,7 +46,7 @@
 .categories__tab:hover {
   background: var(--light-100);
   color: var(--bg-800);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(var(--black-rgb),0.08);
   transform: translateY(-1px);
 }
 
@@ -55,7 +55,7 @@
 .categories__tab--active {
   background: var(--red);
   color: var(--light-100);
-  box-shadow: 0 4px 12px rgba(204,0,0,0.35);
+  box-shadow: 0 4px 12px rgba(var(--red-glow-rgb),0.35);
 }
 
 .categories__tab--active:hover {

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo-mark.png';
+import { IconEye, IconEyeOff } from '../../customize/icons';
 import './AuthModal.css';
 
 export default function AuthModal() {
@@ -86,13 +88,13 @@ export default function AuthModal() {
 
   return (
     <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && closeModal()}>
-      <div className="auth-modal" role="dialog" aria-modal="true" aria-label={tab === 'signin' ? 'Sign In' : 'Create Account'}>
+      <div className="auth-modal" role="dialog" aria-modal="true" aria-label={tab === 'signin' ? 'Sign in' : 'Create account'}>
         {/* Close button */}
         <button className="auth-modal__close" onClick={closeModal} aria-label="Close">✕</button>
 
         {/* Brand */}
         <div className="auth-modal__brand">
-          <span className="auth-modal__brand-name">Kit Lab</span>
+          <img src={logo} alt="Kit Lab" className="auth-modal__brand-logo" />
         </div>
 
         {/* Tabs */}
@@ -101,20 +103,20 @@ export default function AuthModal() {
             className={`auth-modal__tab${tab === 'signin' ? ' auth-modal__tab--active' : ''}`}
             onClick={() => switchTab('signin')}
           >
-            Sign In
+            Sign in
           </button>
           <button
             className={`auth-modal__tab${tab === 'signup' ? ' auth-modal__tab--active' : ''}`}
             onClick={() => switchTab('signup')}
           >
-            Create Account
+            Create account
           </button>
         </div>
 
         <form className="auth-modal__form" onSubmit={handleSubmit} noValidate>
           {tab === 'signup' && (
             <div className="auth-modal__field">
-              <label htmlFor="auth-name">Full Name</label>
+              <label htmlFor="auth-name">Full name</label>
               <input
                 id="auth-name"
                 ref={tab === 'signup' ? firstInputRef : null}
@@ -129,7 +131,7 @@ export default function AuthModal() {
           )}
 
           <div className="auth-modal__field">
-            <label htmlFor="auth-email">Email Address</label>
+            <label htmlFor="auth-email">Email address</label>
             <input
               id="auth-email"
               ref={tab === 'signin' ? firstInputRef : null}
@@ -160,14 +162,14 @@ export default function AuthModal() {
                 onClick={() => setShowPwd(v => !v)}
                 aria-label={showPwd ? 'Hide password' : 'Show password'}
               >
-                {showPwd ? '🙈' : '👁️'}
+                {showPwd ? <IconEyeOff /> : <IconEye />}
               </button>
             </div>
           </div>
 
           {tab === 'signup' && (
             <div className="auth-modal__field">
-              <label htmlFor="auth-confirm">Confirm Password</label>
+              <label htmlFor="auth-confirm">Confirm password</label>
               <input
                 id="auth-confirm"
                 type={showPwd ? 'text' : 'password'}
@@ -188,12 +190,12 @@ export default function AuthModal() {
 
           <button
             type="submit"
-            className={`btn btn-red auth-modal__submit${loading ? ' auth-modal__submit--loading' : ''}`}
+            className={`btn btn-red auth-modal__submit${loading ? ' auth-modal__submit--loading' : ''}${tab === 'signin' ? ' auth-modal__submit--signin' : ''}`}
             disabled={loading}
           >
             {loading
               ? 'Please wait…'
-              : tab === 'signin' ? 'Sign In' : 'Create Account'}
+              : tab === 'signin' ? 'Sign in' : 'Create account'}
           </button>
 
           <p className="auth-modal__switch">

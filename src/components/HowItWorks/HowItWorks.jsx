@@ -3,9 +3,9 @@ import useInView from '../../hooks/useInView';
 import './HowItWorks.css';
 
 const STEPS = [
-  { num: '1', title: 'Pick Your Kit',  desc: 'Choose from our wide range of sports kits and styles.' },
-  { num: '2', title: 'Customize',      desc: 'Add names, numbers, colors, and personal touches.' },
-  { num: '3', title: 'Delivered',      desc: 'Fast delivery to your door with quality guarantee.' },
+  { num: '1', title: 'Pick Your Kit',  desc: 'Choose from our wide range of sports kits and styles.', to: '/kits' },
+  { num: '2', title: 'Customize',      desc: 'Add names, numbers, colors, and personal touches.',       to: '/customize' },
+  { num: '3', title: 'Delivered',      desc: 'Fast delivery to your door with quality guarantee.',       to: '/checkout' },
 ];
 
 export default function HowItWorks() {
@@ -21,9 +21,9 @@ export default function HowItWorks() {
         </div>
 
         <div className="how__steps" ref={stepsRef}>
-          {STEPS.map(({ num, title, desc }, index) => (
+          {STEPS.map(({ num, title, desc, to }, index) => (
             <div key={num} className={`how__step anim-fade-up delay-${index + 1}${stepsVisible ? ' is-visible' : ''}`}>
-              <Link to="/customize" className="how__step-circle">
+              <Link to={to} className="how__step-circle">
                 <span className="how__step-num">{num}</span>
               </Link>
               <h3 className="how__step-title">{title}</h3>

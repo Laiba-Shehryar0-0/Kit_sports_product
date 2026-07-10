@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { hasPickedDesign } from './customize/kitShapes';
 import AuthModal  from './components/AuthModal/AuthModal';
 import Navbar     from './components/Navbar/Navbar';
 import Footer     from './components/Footer/Footer';
@@ -10,6 +11,19 @@ import Customize  from './pages/Customize';
 import Checkout   from './pages/Checkout';
 import About      from './pages/About';
 import Contact    from './pages/Contact';
+
+/** Guards /checkout: requires a signed-in user who has already picked/saved a design. */
+function CheckoutGuard() {
+  const { user, openSignIn } = useAuth();
+
+  useEffect(() => {
+    if (!user) openSignIn();
+  }, [user, openSignIn]);
+
+  if (!user) return <Navigate to="/" replace />;
+  if (!hasPickedDesign()) return <Navigate to="/customize" replace />;
+  return <Checkout />;
+}
 
 const IMMERSIVE_ROUTES = ['/customize', '/checkout'];
 
@@ -36,7 +50,7 @@ export default function App() {
           <Route path="/"          element={<Home />} />
           <Route path="/kits"      element={<Kits />} />
           <Route path="/customize" element={<Customize />} />
-          <Route path="/checkout"  element={<Checkout />} />
+          <Route path="/checkout"  element={<CheckoutGuard />} />
           <Route path="/about"     element={<About />} />
           <Route path="/contact"   element={<Contact />} />
           <Route path="*"          element={<NotFound />} />

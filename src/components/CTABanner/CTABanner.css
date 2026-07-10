@@ -11,8 +11,8 @@
   background:
     repeating-linear-gradient(
       45deg,
-      rgba(0,0,0,0.04) 0px,
-      rgba(0,0,0,0.04) 1px,
+      rgba(var(--black-rgb),0.04) 0px,
+      rgba(var(--black-rgb),0.04) 1px,
       transparent 1px,
       transparent 20px
     );
@@ -48,7 +48,7 @@
   font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.55);
+  color: rgba(var(--black-rgb), 0.55);
 }
 
 .cta-banner__btn {
@@ -56,7 +56,7 @@
   font-size: 14px;
   padding: 16px 48px;
   border-radius: 8px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 24px rgba(var(--black-rgb), 0.2);
 }
 
 @media (max-width: 768px) {
