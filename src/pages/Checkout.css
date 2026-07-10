@@ -184,6 +184,13 @@
   padding: var(--space-2);
 }
 
+.checkout__kit-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
 .checkout__kit-facts {
   flex: 1;
   display: flex;

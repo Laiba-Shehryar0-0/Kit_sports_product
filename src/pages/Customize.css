@@ -152,9 +152,10 @@
     var(--bg-800);
   min-height: 0;
   overflow: auto;
+  scrollbar-width: none;
 }
 
-.customizer__canvas::-webkit-scrollbar-thumb { background: var(--border-medium); }
+.customizer__canvas::-webkit-scrollbar { display: none; width: 0; }
 
 .customizer__canvas-card {
   position: relative;
@@ -267,14 +268,14 @@
   bottom: var(--space-6);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--gold);
-  color: var(--bg-800);
+  background: none;
+  color: var(--light-100);
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.5px;
   padding: 12px 24px;
   border-radius: var(--radius-full);
-  box-shadow: var(--shadow-gold);
+  box-shadow: none;
   z-index: 100;
   animation: toastPop 220ms ease;
 }
@@ -333,9 +334,10 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+  scrollbar-width: none;
 }
 
-.customizer__panel::-webkit-scrollbar-thumb { background: var(--border-medium); }
+.customizer__panel::-webkit-scrollbar { display: none; width: 0; }
 
 /* ============================================================
    PANELS — shared
@@ -356,6 +358,8 @@
 
 .panel__section:first-child { padding-top: 0; }
 .panel__section:last-child { border-bottom: none; }
+.panel__section--no-border { border-bottom: none; padding-bottom: var(--space-2); }
+.panel__section--no-border + .panel__section { padding-top: var(--space-2); }
 
 .panel__label {
   font-family: var(--font-body);
@@ -548,7 +552,7 @@
 
 .panel__more-btn {
   display: block;
-  margin: var(--space-2) auto 0;
+  margin: 4px 0 0 auto;
   background: none;
   border: none;
   color: var(--light-100);
@@ -911,42 +915,17 @@
   color: var(--bg-800);
 }
 
-/* Free Draw Studio handoff */
 .panel__draw-studio-link {
   width: 100%;
   justify-content: center;
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
-.panel__drawn-logo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  margin-bottom: var(--space-3);
-  background: var(--bg-600);
-  border: 1.5px solid var(--border-dark);
-  border-radius: var(--radius-md);
-}
-
-.panel__drawn-logo img {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  background: var(--canvas-light);
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-}
-
-.panel__drawn-logo > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
-}
-
-.panel__drawn-logo .btn {
-  padding: 8px 14px;
-  font-size: 10.5px;
+.panel__draw-studio-link + .panel__hint {
+  margin-top: var(--space-3);
+  white-space: nowrap;
 }
 
 /* Dropzone */

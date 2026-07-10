@@ -108,8 +108,6 @@ function KitCard({ kit }) {
       style={{
         "--kit-color": kit.color,
         "--kit-accent": kit.accent,
-        "--kit-tag-bg": kit.tagBg,
-        "--kit-hover-rgb": kit.hoverRgb,
         textDecoration: "none",
       }}
     >

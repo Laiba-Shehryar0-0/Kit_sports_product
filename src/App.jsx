@@ -12,9 +12,10 @@ import Checkout   from './pages/Checkout';
 import About      from './pages/About';
 import Contact    from './pages/Contact';
 
-// Lazy-loaded: pulls in fabric.js (~300KB), so it should only download when
-// someone actually opens the Draw Studio, not on every page visit.
+// Lazy-loaded: both pull in fabric.js (~300KB), so it should only download when
+// someone actually opens one of these, not on every page visit.
 const DrawStudio = lazy(() => import('./pages/DrawStudio'));
+const KitEditor  = lazy(() => import('./pages/KitEditor'));
 
 /** Guards /checkout: requires a signed-in user who has already picked/saved a design. */
 function CheckoutGuard() {
@@ -29,7 +30,7 @@ function CheckoutGuard() {
   return <Checkout />;
 }
 
-const IMMERSIVE_ROUTES = ['/customize', '/checkout', '/draw-studio'];
+const IMMERSIVE_ROUTES = ['/customize', '/checkout', '/draw-studio', '/kit-editor'];
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -59,6 +60,11 @@ export default function App() {
               <DrawStudio />
             </Suspense>
           } />
+          <Route path="/kit-editor" element={
+            <Suspense fallback={<PageLoading />}>
+              <KitEditor />
+            </Suspense>
+          } />
           <Route path="/checkout"  element={<CheckoutGuard />} />
           <Route path="/about"     element={<About />} />
           <Route path="/contact"   element={<Contact />} />
@@ -83,7 +89,7 @@ function PageLoading() {
       fontSize: '13px',
       letterSpacing: '0.5px',
     }}>
-      Loading Draw Studio…
+      Loading…
     </div>
   );
 }

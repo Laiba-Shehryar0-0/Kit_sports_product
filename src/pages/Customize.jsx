@@ -5,7 +5,7 @@ import useHistoryState from '../hooks/useHistoryState';
 import {
   KIT_TYPES, SPORTS, SIZES, SIZE_UNITS, COLOR_PALETTE, APPLY_TARGETS,
   FONTS, DESIGN_TEMPLATES, BADGE_PRESETS, POSITIONS,
-  DESIGN_STORAGE_KEY, SAVED_DESIGNS_KEY, DRAWN_LOGO_KEY, loadStoredDesign,
+  DESIGN_STORAGE_KEY, SAVED_DESIGNS_KEY, loadStoredDesign,
 } from '../customize/kitShapes';
 import {
   IconSelect, IconDraw, IconText, IconUndo, IconRedo, IconSave, IconExport,
@@ -88,6 +88,7 @@ const TABS = [
   { id: 'kit',    label: 'Kit',    icon: <IconKit /> },
   { id: 'colors', label: 'Colors', icon: <IconPalette /> },
   { id: 'text',   label: 'Text',   icon: <IconText /> },
+  { id: 'draw',   label: 'Draw',   icon: <IconDraw /> },
   { id: 'assets', label: 'Assets', icon: <IconTag /> },
   { id: 'layers', label: 'Layers', icon: <IconLayers /> },
 ];
@@ -251,11 +252,11 @@ export default function Customize() {
         {/* ── Left icon rail ──────────────────────────────────── */}
         {!railHidden && (
           <div className="customizer__rail">
-            <ToolBtn active={activeTool === 'select'} onClick={() => selectTool('select', 'kit')} title="Select — browse kit options"><IconSelect /></ToolBtn>
-            <ToolBtn active={activeTool === 'pan'} onClick={() => selectTool('pan')} title="Pan — drag the canvas to reposition"><IconPan /></ToolBtn>
-            <ToolBtn active={activeTool === 'draw'} onClick={() => selectTool('draw', 'colors')} title="Draw — edit kit colors"><IconDraw /></ToolBtn>
-            <ToolBtn active={activeTool === 'text'} onClick={() => selectTool('text', 'text')} title="Text — edit name & number"><IconText /></ToolBtn>
-            <ToolBtn active={activeTool === 'layers'} onClick={() => selectTool('layers', 'layers')} title="Layers — manage layer stack"><IconLayers /></ToolBtn>
+            <ToolBtn active={activeTool === 'select'} onClick={() => selectTool('select', 'kit')} title="Select"><IconSelect /></ToolBtn>
+            <ToolBtn active={activeTool === 'pan'} onClick={() => selectTool('pan')} title="Pan"><IconPan /></ToolBtn>
+            <ToolBtn onClick={() => navigate('/kit-editor')} title="Draw"><IconDraw /></ToolBtn>
+            <ToolBtn active={activeTool === 'text'} onClick={() => selectTool('text', 'text')} title="Text"><IconText /></ToolBtn>
+            <ToolBtn active={activeTool === 'layers'} onClick={() => selectTool('layers', 'layers')} title="Layers"><IconLayers /></ToolBtn>
           </div>
         )}
 
@@ -348,6 +349,8 @@ export default function Customize() {
               <TextPanel design={design} patch={patch} />
             )}
 
+            {activeTab === 'draw' && <DrawPanel />}
+
             {activeTab === 'assets' && (
               <AssetsPanel
                 design={design} patch={patch}
@@ -435,7 +438,7 @@ function KitPanel({ design, patch }) {
 
   return (
     <div className="panel">
-      <div className="panel__section">
+      <div className="panel__section panel__section--no-border">
         <h3 className="panel__label">Kit Type</h3>
 
         {!activeGroup ? (
@@ -471,7 +474,7 @@ function KitPanel({ design, patch }) {
         )}
       </div>
 
-      <div className="panel__section">
+      <div className="panel__section panel__section--no-border">
         <h3 className="panel__label">Templates</h3>
         <div className="panel__template-grid">
           {visibleTemplates.map(t => (
@@ -579,7 +582,6 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
     <div className="panel">
       <div className="panel__section">
         <h3 className="panel__label">Apply To</h3>
-        <p className="panel__hint">Pick a part of the kit, then choose its color below.</p>
         <div className="panel__segmented">
           {APPLY_TARGETS.map(t => (
             <button
@@ -662,7 +664,7 @@ function TextPanel({ design, patch }) {
         />
       </div>
 
-      <div className="panel__section">
+      <div className="panel__section panel__section--no-border">
         <h3 className="panel__label">Font Style</h3>
         <div className="panel__font-grid">
           {visibleFonts.map(f => (
@@ -742,39 +744,25 @@ function PositionGrid({ value, onChange }) {
   );
 }
 
-/* ── Assets Panel ───────────────────────────────────────────── */
-function AssetsPanel({ design, patch, fileInputRef, onFile }) {
-  const [dragOver, setDragOver] = useState(false);
-  const [drawnLogo, setDrawnLogo] = useState(null);
-
-  useEffect(() => {
-    try { setDrawnLogo(localStorage.getItem(DRAWN_LOGO_KEY)); } catch { /* storage unavailable */ }
-  }, []);
-
-  const useDrawnLogo = () => {
-    patch({ logoDataUrl: drawnLogo, logoPreset: null });
-    try { localStorage.removeItem(DRAWN_LOGO_KEY); } catch { /* storage unavailable */ }
-    setDrawnLogo(null);
-  };
-
+/* ── Draw Panel — launches the full Fabric.js kit editor ───────── */
+function DrawPanel() {
   return (
     <div className="panel">
       <div className="panel__section">
-        <h3 className="panel__label">Free Draw Studio</h3>
-        {drawnLogo && (
-          <div className="panel__drawn-logo">
-            <img src={drawnLogo} alt="Your drawing" />
-            <div>
-              <button className="btn btn-darkred" onClick={useDrawnLogo}>Use this drawing as logo</button>
-              <button className="panel__link-btn" onClick={() => { localStorage.removeItem(DRAWN_LOGO_KEY); setDrawnLogo(null); }}>Discard</button>
-            </div>
-          </div>
-        )}
-        <Link to="/draw-studio" className="btn btn-grey panel__draw-studio-link">
-          Draw your own logo →
+        <Link to="/kit-editor" className="btn btn-grey panel__draw-studio-link">
+          Open kit editor →
         </Link>
       </div>
+    </div>
+  );
+}
 
+/* ── Assets Panel ───────────────────────────────────────────── */
+function AssetsPanel({ design, patch, fileInputRef, onFile }) {
+  const [dragOver, setDragOver] = useState(false);
+
+  return (
+    <div className="panel">
       <div className="panel__section">
         <h3 className="panel__label">Upload Logo / Badge</h3>
         <div

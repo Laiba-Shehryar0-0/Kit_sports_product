@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import KitPreview from '../customize/KitPreview';
 import {
   KIT_TYPES, SPORTS, SIZES, DESIGN_TEMPLATES, BASE_PRICES,
-  DELIVERY_METHODS, QUANTITY_PRESETS, PAYMENT_METHODS, loadStoredDesign,
+  DELIVERY_METHODS, QUANTITY_PRESETS, PAYMENT_METHODS, loadStoredDesign, EDITED_KIT_KEY,
 } from '../customize/kitShapes';
 import {
   IconChevronLeft, IconLock, IconTruck, IconCard, IconBank, IconCash,
@@ -25,6 +25,9 @@ function formatPKR(n) {
 
 export default function Checkout() {
   const [design] = useState(loadStoredDesign);
+  const [editedKit] = useState(() => {
+    try { return localStorage.getItem(EDITED_KIT_KEY); } catch { return null; }
+  });
   const navigate = useNavigate();
 
   const [totalKits, setTotalKits] = useState(11);
@@ -118,15 +121,19 @@ export default function Checkout() {
           <Card step={1} title="Kit Summary">
             <div className="checkout__kit-summary">
               <div className="checkout__kit-thumb">
-                <KitPreview
-                  kitType={design.kitType} bodyColor={design.bodyColor} sleeveColor={design.sleeveColor}
-                  numberColor={design.numberColor} collarColor={design.collarColor} opacity={design.opacity}
-                  template={design.template} playerName={design.playerName} playerNumber={design.playerNumber}
-                  font={design.font} nameSize={design.nameSize} numberSize={design.numberSize}
-                  textPosition={design.textPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
-                  logoScale={design.logoScale} logoOpacity={design.logoOpacity} logoPosition={design.logoPosition}
-                  side="front" layers={design.layers}
-                />
+                {editedKit ? (
+                  <img src={editedKit} alt="Your edited kit" className="checkout__kit-thumb-img" />
+                ) : (
+                  <KitPreview
+                    kitType={design.kitType} bodyColor={design.bodyColor} sleeveColor={design.sleeveColor}
+                    numberColor={design.numberColor} collarColor={design.collarColor} opacity={design.opacity}
+                    template={design.template} playerName={design.playerName} playerNumber={design.playerNumber}
+                    font={design.font} nameSize={design.nameSize} numberSize={design.numberSize}
+                    textPosition={design.textPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
+                    logoScale={design.logoScale} logoOpacity={design.logoOpacity} logoPosition={design.logoPosition}
+                    side="front" layers={design.layers}
+                  />
+                )}
               </div>
               <div className="checkout__kit-facts">
                 <FactRow label="Kit Type" value={`${sportLabel} ${kitLabel}`} />
@@ -266,15 +273,19 @@ export default function Checkout() {
 
             <div className="checkout__summary-item">
               <div className="checkout__summary-thumb">
-                <KitPreview
-                  kitType={design.kitType} bodyColor={design.bodyColor} sleeveColor={design.sleeveColor}
-                  numberColor={design.numberColor} collarColor={design.collarColor} opacity={design.opacity}
-                  template={design.template} playerName={design.playerName} playerNumber={design.playerNumber}
-                  font={design.font} nameSize={design.nameSize} numberSize={design.numberSize}
-                  textPosition={design.textPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
-                  logoScale={design.logoScale} logoOpacity={design.logoOpacity} logoPosition={design.logoPosition}
-                  side="front" layers={design.layers}
-                />
+                {editedKit ? (
+                  <img src={editedKit} alt="Your edited kit" className="checkout__kit-thumb-img" />
+                ) : (
+                  <KitPreview
+                    kitType={design.kitType} bodyColor={design.bodyColor} sleeveColor={design.sleeveColor}
+                    numberColor={design.numberColor} collarColor={design.collarColor} opacity={design.opacity}
+                    template={design.template} playerName={design.playerName} playerNumber={design.playerNumber}
+                    font={design.font} nameSize={design.nameSize} numberSize={design.numberSize}
+                    textPosition={design.textPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
+                    logoScale={design.logoScale} logoOpacity={design.logoOpacity} logoPosition={design.logoPosition}
+                    side="front" layers={design.layers}
+                  />
+                )}
               </div>
               <div>
                 <strong>{sportLabel} {kitLabel} Custom</strong>

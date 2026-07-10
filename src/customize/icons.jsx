@@ -112,6 +112,30 @@ export const IconChevronLeft = (p) => (
   <svg {...base} {...p}><path d="M15 4 L7 12 L15 20" /></svg>
 );
 
+export const IconBucket = (p) => (
+  <svg {...base} {...p}>
+    <path d="M5 11 L13 3 L21 11 Q21 15 13 15 Q5 15 5 11 Z" />
+    <path d="M3 15 Q3 20 8 20 Q13 20 13 15" />
+    <circle cx="19" cy="18" r="1.4" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const IconEraser = (p) => (
+  <svg {...base} {...p}>
+    <path d="M8 20 H21" />
+    <path d="M16 3 L21 8 L9 20 L4 15 Z" />
+    <path d="M14 5 L19 10" />
+  </svg>
+);
+
+export const IconShapes = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="8" cy="8" r="5" />
+    <rect x="13" y="13" width="8" height="8" />
+    <path d="M4 21 L9 12 L14 21 Z" />
+  </svg>
+);
+
 export const IconLock = (p) => (
   <svg {...base} {...p}>
     <rect x="5" y="11" width="14" height="10" rx="2" />

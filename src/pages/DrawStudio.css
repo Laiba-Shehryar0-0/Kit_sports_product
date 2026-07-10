@@ -3,11 +3,24 @@
    shared .customizer__* / .panel__* chrome
    ============================================================ */
 
+.draw__hidden-preview {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .draw__back-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   color: var(--light-300);
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
@@ -25,21 +38,73 @@
 }
 
 .draw__canvas-card {
+  position: relative;
   background: var(--canvas-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: var(--space-4);
   line-height: 0;
+  max-height: calc(100vh - 260px);
 }
 
-.draw__canvas-card canvas { border-radius: var(--radius-md); }
+.draw__canvas-card canvas {
+  border-radius: var(--radius-md);
+  max-height: calc(100vh - 260px - (var(--space-4) * 2));
+  width: auto;
+  display: block;
+}
+
+/* Kit Editor only — bigger canvas, using the room freed up now that there's no hint text below it.
+   Kept a margin below the exact math (vs. .customizer__canvas's own available space) so it never
+   nudges into overflow and triggers that container's scrollbar. */
+.draw__canvas-card--kit {
+  max-height: calc(100vh - 210px);
+}
+
+.draw__canvas-card--kit canvas {
+  max-height: calc(100vh - 210px - (var(--space-4) * 2));
+}
+
+.draw__toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--black);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 3;
+  animation: drawToastPop 220ms ease;
+}
+
+@keyframes drawToastPop {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.draw__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--canvas-light);
+  border-radius: var(--radius-lg);
+  color: var(--light-700);
+  font-family: var(--font-body);
+  font-size: 13px;
+  z-index: 2;
+}
 
 .draw__hint {
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   font-size: 12px;
   color: var(--light-600);
   text-align: center;
-  max-width: 420px;
+  white-space: nowrap;
 }
 
 /* Layer list */
@@ -78,6 +143,13 @@
   white-space: nowrap;
 }
 
+.draw__layer-row-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
 .draw__layer-row button {
   display: flex;
   align-items: center;
@@ -89,4 +161,49 @@
   flex-shrink: 0;
 }
 
+.draw__layer-row button:hover { color: var(--red-light); }
+
 .draw__layer-row button svg { width: 16px; height: 16px; }
+
+/* Shape grid */
+.draw__shape-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.draw__shape-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-3) var(--space-2);
+  background: var(--bg-600);
+  border: 1.5px solid var(--border-dark);
+  color: var(--light-500);
+  font-family: var(--font-body);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 180ms ease;
+}
+
+.draw__shape-btn:hover {
+  border-color: var(--light-100);
+  color: var(--light-100);
+  background: var(--bg-500);
+  transform: translateY(-2px);
+}
+
+.draw__shape-icon { width: 28px; height: 28px; color: var(--light-400); }
+.draw__shape-btn:hover .draw__shape-icon { color: var(--light-100); }
+
+.draw__shape-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
