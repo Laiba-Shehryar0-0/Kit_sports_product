@@ -1,11 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import KitPreview from '../customize/KitPreview';
 import useHistoryState from '../hooks/useHistoryState';
 import {
   KIT_TYPES, SPORTS, SIZES, SIZE_UNITS, COLOR_PALETTE, APPLY_TARGETS,
   FONTS, DESIGN_TEMPLATES, BADGE_PRESETS, POSITIONS,
   DESIGN_STORAGE_KEY, SAVED_DESIGNS_KEY, loadStoredDesign,
+  loadEditedKitImage, clearEditedKitImage,
 } from '../customize/kitShapes';
 import {
   IconSelect, IconDraw, IconText, IconUndo, IconRedo, IconSave, IconExport,
@@ -104,11 +105,14 @@ const DEFAULT_LAYER_ORDER = [
 ];
 
 export default function Customize() {
+  const [searchParams] = useSearchParams();
   const [design, setDesign, { undo, redo, canUndo, canRedo }] = useHistoryState(loadStoredDesign);
   const [activeTab, setActiveTab] = useState('kit');
   const [activeTool, setActiveTool] = useState('select');
   const [applyTarget, setApplyTarget] = useState('body');
-  const [side, setSide] = useState('front');
+  // Coming back from the Kit Editor carries ?side=front|back so this reopens on the same side
+  // that was just edited, instead of always defaulting to front.
+  const [side, setSide] = useState(() => (searchParams.get('side') === 'back' ? 'back' : 'front'));
   const [railHidden, setRailHidden] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
@@ -157,17 +161,37 @@ export default function Customize() {
     try { localStorage.setItem(DESIGN_STORAGE_KEY, JSON.stringify(design)); } catch { /* storage unavailable */ }
   }, [design]);
 
+  // Shows the flattened, drawn-on kit from the Kit Editor (if this side has one) in place of the
+  // live SVG preview — so coming "Back" from editing actually shows what was drawn.
+  const [editedKitUrl, setEditedKitUrl] = useState(() => loadEditedKitImage(side));
+
+  useEffect(() => {
+    setEditedKitUrl(loadEditedKitImage(side));
+  }, [side]);
+
+  // Any further customization (color/text/logo/etc.) invalidates the frozen snapshot for this
+  // side — otherwise those changes would silently stop showing up on screen. Called explicitly
+  // from each mutator below rather than reactively off `design`, since a "have we run yet" ref
+  // guard for that would itself misfire under StrictMode's dev-only double-invoke of effects.
+  const invalidateEditedKit = useCallback(() => {
+    clearEditedKitImage(side);
+    setEditedKitUrl(null);
+  }, [side]);
+
   const patch = useCallback((partial) => {
     setDesign(prev => ({ ...prev, ...partial }));
-  }, [setDesign]);
+    invalidateEditedKit();
+  }, [setDesign, invalidateEditedKit]);
 
   const patchOpacity = useCallback((target, value) => {
     setDesign(prev => ({ ...prev, opacity: { ...prev.opacity, [target]: value } }));
-  }, [setDesign]);
+    invalidateEditedKit();
+  }, [setDesign, invalidateEditedKit]);
 
   const toggleLayer = useCallback((id) => {
     setDesign(prev => ({ ...prev, layers: { ...prev.layers, [id]: !prev.layers[id] } }));
-  }, [setDesign]);
+    invalidateEditedKit();
+  }, [setDesign, invalidateEditedKit]);
 
   const reorderLayers = useCallback((fromId, toId) => {
     if (fromId === toId) return;
@@ -179,7 +203,8 @@ export default function Customize() {
       order.splice(toIdx, 0, fromId);
       return { ...prev, layerOrder: order };
     });
-  }, [setDesign]);
+    invalidateEditedKit();
+  }, [setDesign, invalidateEditedKit]);
 
   const handleSave = useCallback(() => {
     try {
@@ -254,7 +279,7 @@ export default function Customize() {
           <div className="customizer__rail">
             <ToolBtn active={activeTool === 'select'} onClick={() => selectTool('select', 'kit')} title="Select"><IconSelect /></ToolBtn>
             <ToolBtn active={activeTool === 'pan'} onClick={() => selectTool('pan')} title="Pan"><IconPan /></ToolBtn>
-            <ToolBtn onClick={() => navigate('/kit-editor')} title="Draw"><IconDraw /></ToolBtn>
+            <ToolBtn onClick={() => navigate(`/kit-editor?side=${side}`)} title="Draw"><IconDraw /></ToolBtn>
             <ToolBtn active={activeTool === 'text'} onClick={() => selectTool('text', 'text')} title="Text"><IconText /></ToolBtn>
             <ToolBtn active={activeTool === 'layers'} onClick={() => selectTool('layers', 'layers')} title="Layers"><IconLayers /></ToolBtn>
           </div>
@@ -275,28 +300,33 @@ export default function Customize() {
                 className="customizer__preview-kit"
                 style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom / 100})` }}
               >
-                <KitPreview
-                  kitType={design.kitType}
-                  bodyColor={design.bodyColor}
-                  sleeveColor={design.sleeveColor}
-                  numberColor={design.numberColor}
-                  collarColor={design.collarColor}
-                  opacity={design.opacity}
-                  template={design.template}
-                  playerName={design.playerName}
-                  playerNumber={design.playerNumber}
-                  font={design.font}
-                  nameSize={design.nameSize}
-                  numberSize={design.numberSize}
-                  textPosition={design.textPosition}
-                  logoDataUrl={design.logoDataUrl}
-                  logoPreset={design.logoPreset}
-                  logoScale={design.logoScale}
-                  logoOpacity={design.logoOpacity}
-                  logoPosition={design.logoPosition}
-                  side={side}
-                  layers={design.layers}
-                />
+                {editedKitUrl ? (
+                  <img src={editedKitUrl} alt="Your edited kit" className="customizer__preview-kit-img" />
+                ) : (
+                  <KitPreview
+                    kitType={design.kitType}
+                    bodyColor={design.bodyColor}
+                    sleeveColor={design.sleeveColor}
+                    numberColor={design.numberColor}
+                    collarColor={design.collarColor}
+                    opacity={design.opacity}
+                    template={design.template}
+                    playerName={design.playerName}
+                    playerNumber={design.playerNumber}
+                    font={design.font}
+                    nameSize={design.nameSize}
+                    numberSize={design.numberSize}
+                    textPosition={design.textPosition}
+                    numberPosition={design.numberPosition}
+                    logoDataUrl={design.logoDataUrl}
+                    logoPreset={design.logoPreset}
+                    logoScale={design.logoScale}
+                    logoOpacity={design.logoOpacity}
+                    logoPosition={design.logoPosition}
+                    side={side}
+                    layers={design.layers}
+                  />
+                )}
               </div>
             </div>
 
@@ -346,10 +376,10 @@ export default function Customize() {
             )}
 
             {activeTab === 'text' && (
-              <TextPanel design={design} patch={patch} />
+              <TextPanel design={design} patch={patch} side={side} setSide={setSide} />
             )}
 
-            {activeTab === 'draw' && <DrawPanel />}
+            {activeTab === 'draw' && <DrawPanel side={side} />}
 
             {activeTab === 'assets' && (
               <AssetsPanel
@@ -642,17 +672,36 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
 }
 
 /* ── Text Panel ─────────────────────────────────────────────── */
-function TextPanel({ design, patch }) {
+function TextPanel({ design, patch, side, setSide }) {
   const [showAllFonts, setShowAllFonts] = useState(false);
   const visibleFonts = showAllFonts ? FONTS : FONTS.slice(0, 4);
 
   return (
     <div className="panel">
       <div className="panel__section">
+        <h3 className="panel__label">Editing Side</h3>
+        <div className="panel__segmented">
+          <button
+            onClick={() => setSide('front')}
+            className={`panel__segment${side === 'front' ? ' panel__segment--active' : ''}`}
+          >
+            Front
+          </button>
+          <button
+            onClick={() => setSide('back')}
+            className={`panel__segment${side === 'back' ? ' panel__segment--active' : ''}`}
+          >
+            Back
+          </button>
+        </div>
+      </div>
+
+      <div className="panel__section">
         <h3 className="panel__label">Player Name</h3>
         <input
           type="text" className="panel__input" placeholder="e.g. RASHFORD" maxLength={18}
-          value={design.playerName} onChange={e => patch({ playerName: e.target.value })}
+          value={design.playerName[side]}
+          onChange={e => patch({ playerName: { ...design.playerName, [side]: e.target.value } })}
         />
       </div>
 
@@ -660,7 +709,8 @@ function TextPanel({ design, patch }) {
         <h3 className="panel__label">Squad Number</h3>
         <input
           type="text" className="panel__input" placeholder="e.g. 7" maxLength={3}
-          value={design.playerNumber} onChange={e => patch({ playerNumber: e.target.value.replace(/\D/g, '') })}
+          value={design.playerNumber[side]}
+          onChange={e => patch({ playerNumber: { ...design.playerNumber, [side]: e.target.value.replace(/\D/g, '') } })}
         />
       </div>
 
@@ -692,8 +742,17 @@ function TextPanel({ design, patch }) {
       </div>
 
       <div className="panel__section">
-        <h3 className="panel__label">Text Position</h3>
-        <PositionGrid value={design.textPosition} onChange={v => patch({ textPosition: v })} />
+        <h3 className="panel__label">Position</h3>
+        <div className="panel__pos-row">
+          <div className="panel__pos-col">
+            <span className="panel__pos-col-label">Name</span>
+            <PositionGrid value={design.textPosition} onChange={v => patch({ textPosition: v })} />
+          </div>
+          <div className="panel__pos-col">
+            <span className="panel__pos-col-label">Number</span>
+            <PositionGrid value={design.numberPosition} onChange={v => patch({ numberPosition: v })} />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -745,11 +804,11 @@ function PositionGrid({ value, onChange }) {
 }
 
 /* ── Draw Panel — launches the full Fabric.js kit editor ───────── */
-function DrawPanel() {
+function DrawPanel({ side }) {
   return (
     <div className="panel">
       <div className="panel__section">
-        <Link to="/kit-editor" className="btn btn-grey panel__draw-studio-link">
+        <Link to={`/kit-editor?side=${side}`} className="btn btn-grey panel__draw-studio-link">
           Open kit editor →
         </Link>
       </div>

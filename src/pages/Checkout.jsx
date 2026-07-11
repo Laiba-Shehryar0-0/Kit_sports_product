@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import KitPreview from '../customize/KitPreview';
 import {
   KIT_TYPES, SPORTS, SIZES, DESIGN_TEMPLATES, BASE_PRICES,
-  DELIVERY_METHODS, QUANTITY_PRESETS, PAYMENT_METHODS, loadStoredDesign, EDITED_KIT_KEY,
+  DELIVERY_METHODS, QUANTITY_PRESETS, PAYMENT_METHODS, loadStoredDesign, loadEditedKitImage,
 } from '../customize/kitShapes';
 import {
   IconChevronLeft, IconLock, IconTruck, IconCard, IconBank, IconCash,
@@ -25,9 +25,7 @@ function formatPKR(n) {
 
 export default function Checkout() {
   const [design] = useState(loadStoredDesign);
-  const [editedKit] = useState(() => {
-    try { return localStorage.getItem(EDITED_KIT_KEY); } catch { return null; }
-  });
+  const [editedKit] = useState(() => loadEditedKitImage('front'));
   const navigate = useNavigate();
 
   const [totalKits, setTotalKits] = useState(11);
@@ -129,7 +127,7 @@ export default function Checkout() {
                     numberColor={design.numberColor} collarColor={design.collarColor} opacity={design.opacity}
                     template={design.template} playerName={design.playerName} playerNumber={design.playerNumber}
                     font={design.font} nameSize={design.nameSize} numberSize={design.numberSize}
-                    textPosition={design.textPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
+                    textPosition={design.textPosition} numberPosition={design.numberPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
                     logoScale={design.logoScale} logoOpacity={design.logoOpacity} logoPosition={design.logoPosition}
                     side="front" layers={design.layers}
                   />
@@ -139,7 +137,7 @@ export default function Checkout() {
                 <FactRow label="Kit Type" value={`${sportLabel} ${kitLabel}`} />
                 <FactRow label="Size" value={sizeDisplay} />
                 <FactRow label="Template" value={templateName} />
-                <FactRow label="Name / No." value={`${design.playerName || 'PLAYER'} / #${design.playerNumber || '—'}`} />
+                <FactRow label="Name / No." value={`${design.playerName.front || design.playerName.back || 'PLAYER'} / #${design.playerNumber.front || design.playerNumber.back || '—'}`} />
                 <FactRow label="Colors" value={
                   <span className="checkout__color-dots">
                     <i style={{ background: design.bodyColor }} />
@@ -281,7 +279,7 @@ export default function Checkout() {
                     numberColor={design.numberColor} collarColor={design.collarColor} opacity={design.opacity}
                     template={design.template} playerName={design.playerName} playerNumber={design.playerNumber}
                     font={design.font} nameSize={design.nameSize} numberSize={design.numberSize}
-                    textPosition={design.textPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
+                    textPosition={design.textPosition} numberPosition={design.numberPosition} logoDataUrl={design.logoDataUrl} logoPreset={design.logoPreset}
                     logoScale={design.logoScale} logoOpacity={design.logoOpacity} logoPosition={design.logoPosition}
                     side="front" layers={design.layers}
                   />
@@ -290,7 +288,7 @@ export default function Checkout() {
               <div>
                 <strong>{sportLabel} {kitLabel} Custom</strong>
                 <span>{templateName} Template</span>
-                <span>#{design.playerNumber || '—'} {(design.playerName || 'PLAYER').toUpperCase()} · Size: {sizeDisplay} · Qty: {totalKits}</span>
+                <span>#{design.playerNumber.front || design.playerNumber.back || '—'} {(design.playerName.front || design.playerName.back || 'PLAYER').toUpperCase()} · Size: {sizeDisplay} · Qty: {totalKits}</span>
               </div>
             </div>
 

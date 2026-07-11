@@ -13,12 +13,13 @@ export default function KitPreview({
   collarColor  = '#000000',
   opacity      = { body: 100, sleeves: 100, number: 100, collar: 100 },
   template     = 'solid',
-  playerName   = '',
-  playerNumber = '',
+  playerName   = { front: '', back: '' },
+  playerNumber = { front: '', back: '' },
   font         = 'Bebas Neue',
   nameSize     = 14,
   numberSize   = 46,
-  textPosition = { x: 0.5, y: 0.5 },
+  textPosition   = { x: 0.5, y: 0.38 },
+  numberPosition = { x: 0.5, y: 0.58 },
   logoDataUrl  = null,
   logoPreset   = null,
   logoScale    = 80,
@@ -32,15 +33,22 @@ export default function KitPreview({
   const shineId = `shine-${side}-${kitType}`;
   const clipId  = `clip-${side}-${kitType}`;
 
-  const showName   = side === 'back'  && layers.name   && playerName;
-  const showNumber = layers.number && playerNumber;
+  // Each side keeps its own independent name & number — typed while viewing the front only
+  // shows on the front, and vice versa — rather than one shared value bleeding onto both sides.
+  const currentName   = typeof playerName === 'object'   ? (playerName?.[side] || '')   : (playerName || '');
+  const currentNumber = typeof playerNumber === 'object' ? (playerNumber?.[side] || '') : (playerNumber || '');
+
+  const showName   = layers.name   && currentName;
+  const showNumber = layers.number && currentNumber;
   const showLogo   = side === 'front' && layers.logo && (logoDataUrl || logoPreset);
 
+  // Name and number each have their own independently adjustable position now, rather than
+  // sharing one spot and relying on a baked-in offset to keep them from overlapping.
   const namePos   = textPosition;
-  const numberPos = textPosition;
+  const numberPos = numberPosition;
   const logoPos   = logoPosition;
 
-  const nameXY   = { x: namePos.x * kit.w,   y: side === 'back' ? namePos.y * kit.h - numberSize * 0.55 : namePos.y * kit.h };
+  const nameXY   = { x: namePos.x * kit.w,   y: namePos.y * kit.h };
   const numberXY = { x: numberPos.x * kit.w, y: numberPos.y * kit.h + (side === 'front' ? 0 : numberSize * 0.3) };
   const logoXY   = { x: logoPos.x * kit.w,   y: logoPos.y * kit.h };
   const logoSize = 18 + (logoScale / 100) * 42;
@@ -110,7 +118,7 @@ export default function KitPreview({
           letterSpacing="3"
           style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
         >
-          {playerName.toUpperCase()}
+          {currentName.toUpperCase()}
         </text>
       )}
 
@@ -125,7 +133,7 @@ export default function KitPreview({
           letterSpacing="2"
           style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}
         >
-          {playerNumber}
+          {currentNumber}
         </text>
       )}
     </svg>

@@ -143,12 +143,13 @@ export const DEFAULT_DESIGN = {
   numberColor: '#FFFFFF',
   collarColor: '#1a1a1a',
   opacity: { body: 100, sleeves: 100, number: 100, collar: 100 },
-  playerName: '',
-  playerNumber: '',
+  playerName: { front: '', back: '' },
+  playerNumber: { front: '', back: '' },
   font: 'Bebas Neue',
   nameSize: 14,
   numberSize: 46,
-  textPosition: { x: 0.50, y: 0.50 },
+  textPosition: { x: 0.50, y: 0.38 },
+  numberPosition: { x: 0.50, y: 0.58 },
   logoDataUrl: null,
   logoPreset: null,
   logoScale: 80,
@@ -161,7 +162,52 @@ export const DEFAULT_DESIGN = {
 export const DESIGN_STORAGE_KEY = 'kitlab_current_design';
 export const SAVED_DESIGNS_KEY = 'kitlab_saved_designs';
 export const DRAWN_LOGO_KEY = 'kitlab_drawn_logo';
+// Flattened, drawn-on kit PNG per side — stored as { front, back }.
 export const EDITED_KIT_KEY = 'kitlab_edited_kit';
+// Full Fabric.js canvas state (strokes, shapes, text — not just the flattened PNG) for the Kit
+// Editor, keyed by side, so reopening it continues the same in-progress edit instead of
+// re-rendering a fresh blank canvas from the live design every time.
+export const KIT_CANVAS_STATE_KEY = 'kitlab_kit_canvas_state';
+
+/** Reads the flattened, drawn-on kit image for one side, if the user has edited and saved it
+ *  from the Kit Editor. */
+export function loadEditedKitImage(side) {
+  try {
+    const raw = localStorage.getItem(EDITED_KIT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.[side] || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Persists the flattened, drawn-on kit image for one side. */
+export function saveEditedKitImage(side, dataUrl) {
+  try {
+    const raw = localStorage.getItem(EDITED_KIT_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed[side] = dataUrl;
+    localStorage.setItem(EDITED_KIT_KEY, JSON.stringify(parsed));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** Clears the saved drawn-on image for one side — used once the live design is customized again
+ *  (color/text/logo/etc.), since the frozen snapshot would otherwise silently stop reflecting it. */
+export function clearEditedKitImage(side) {
+  try {
+    const raw = localStorage.getItem(EDITED_KIT_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (!(side in parsed)) return;
+    delete parsed[side];
+    localStorage.setItem(EDITED_KIT_KEY, JSON.stringify(parsed));
+  } catch {
+    /* storage unavailable */
+  }
+}
 
 /** True once the user has saved a design or placed an order at least once */
 export function hasPickedDesign() {
@@ -184,6 +230,14 @@ function normalizePosition(value, fallback) {
   return fallback;
 }
 
+/** Migrates a legacy single (non-side-specific) name/number string to the {front,back} shape —
+ *  applied to both sides so an old saved design still looks the same as before this change. */
+function normalizeBySide(value, fallback) {
+  if (value && typeof value === 'object') return { front: value.front ?? '', back: value.back ?? '' };
+  if (typeof value === 'string' && value) return { front: value, back: value };
+  return fallback;
+}
+
 /** Reads the last-edited kit design from localStorage, merged onto DEFAULT_DESIGN */
 export function loadStoredDesign() {
   try {
@@ -196,7 +250,10 @@ export function loadStoredDesign() {
       opacity: { ...DEFAULT_DESIGN.opacity, ...(parsed.opacity || {}) },
       layers: { ...DEFAULT_DESIGN.layers, ...(parsed.layers || {}) },
       textPosition: normalizePosition(parsed.textPosition, DEFAULT_DESIGN.textPosition),
+      numberPosition: normalizePosition(parsed.numberPosition, DEFAULT_DESIGN.numberPosition),
       logoPosition: normalizePosition(parsed.logoPosition, DEFAULT_DESIGN.logoPosition),
+      playerName: normalizeBySide(parsed.playerName, DEFAULT_DESIGN.playerName),
+      playerNumber: normalizeBySide(parsed.playerNumber, DEFAULT_DESIGN.playerNumber),
     };
   } catch {
     return DEFAULT_DESIGN;

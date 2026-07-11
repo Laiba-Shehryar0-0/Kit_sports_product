@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Canvas, PencilBrush, Textbox, FabricImage, Ellipse, Polygon, Path } from 'fabric';
 import KitPreview from './KitPreview';
-import { COLOR_PALETTE, FONTS, loadStoredDesign, DRAWN_LOGO_KEY, EDITED_KIT_KEY } from './kitShapes';
+import { COLOR_PALETTE, FONTS, loadStoredDesign, DRAWN_LOGO_KEY, saveEditedKitImage, KIT_CANVAS_STATE_KEY } from './kitShapes';
 import {
   IconSelect, IconDraw, IconText, IconUndo, IconRedo, IconExport, IconLayers,
   IconEye, IconEyeOff, IconTrash, IconChevronLeft, IconBucket, IconEraser, IconShapes,
@@ -11,8 +11,15 @@ import ColorPicker from './ColorPicker';
 import '../pages/Customize.css';
 import '../pages/DrawStudio.css';
 
-const CANVAS_W = 520;
-const CANVAS_H = 620;
+// Matches the on-screen size of the kit preview on the main Customize page (its
+// .customizer__preview-kit box: max 300x360, 5:6 aspect) — Fabric renders its canvas at this
+// resolution 1:1 via inline pixel styles it controls itself, so the kit doesn't jump to a
+// different, blown-up scale when opening this editor.
+const CANVAS_W = 300;
+const CANVAS_H = 360;
+// Fabric's toDataURL multiplier applied at export time — scaled up from the on-screen 300x360
+// canvas so exported PNGs keep roughly the same pixel resolution the editor produced before.
+const EXPORT_MULTIPLIER = 1040 / CANVAS_W;
 
 const TABS = [
   { id: 'colors', label: 'Colors', icon: <IconDraw /> },
@@ -105,6 +112,57 @@ function ShapeIcon({ def }) {
   );
 }
 
+/** Preloads every <image> in a cloned SVG and inlines its href as a data URL. The clone is
+ *  about to be serialized and rasterized as one flat image via an <img>'s load event — an
+ *  external (non-data) href like an uploaded logo or badge preset isn't guaranteed to have
+ *  finished loading by the time that outer load event fires, which silently drops it from the
+ *  drawing surface. Inlining first means there's nothing left to fetch at rasterize time. */
+function inlineSvgImages(svgEl) {
+  const images = Array.from(svgEl.querySelectorAll('image'));
+  return Promise.all(images.map(imgEl => {
+    const href = imgEl.getAttribute('href') || imgEl.getAttribute('xlink:href');
+    if (!href || href.startsWith('data:')) return Promise.resolve();
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth || 1;
+        c.height = img.naturalHeight || 1;
+        c.getContext('2d').drawImage(img, 0, 0);
+        imgEl.setAttribute('href', c.toDataURL('image/png'));
+        resolve();
+      };
+      img.onerror = resolve;
+      img.src = href;
+    });
+  }));
+}
+
+/** Reads back the saved Fabric canvas state (strokes, shapes, text) for one side of the Kit
+ *  Editor, if any was saved on a previous visit. */
+function loadKitCanvasState(side) {
+  try {
+    const raw = localStorage.getItem(KIT_CANVAS_STATE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw)?.[side] || null;
+  } catch {
+    return null;
+  }
+}
+
+/** Persists the Fabric canvas state (via canvas.toJSON()) for one side of the Kit Editor, so
+ *  reopening it later continues the same in-progress edit instead of starting over. */
+function saveKitCanvasState(side, json) {
+  try {
+    const raw = localStorage.getItem(KIT_CANVAS_STATE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed[side] = json;
+    localStorage.setItem(KIT_CANVAS_STATE_KEY, JSON.stringify(parsed));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 function themeColor(name, fallback) {
   if (typeof window === 'undefined') return fallback;
   const val = getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim();
@@ -155,7 +213,7 @@ function floodFill(imageData, startX, startY, fillRgba, tolerance = 32) {
  * exports the result as a logo image) and Kit Editor (mode="kit" — draws on the kit,
  * exports it as the finished kit artwork). Same tools, different purpose/output.
  */
-export default function KitCanvasEditor({ mode }) {
+export default function KitCanvasEditor({ mode, initialSide = 'front' }) {
   const navigate = useNavigate();
   const canvasElRef = useRef(null);
   const fabricRef = useRef(null);
@@ -231,6 +289,15 @@ export default function KitCanvasEditor({ mode }) {
 
   /* ── Create the fabric canvas once ─────────────────────────── */
   useEffect(() => {
+    // React 18 StrictMode double-invokes this effect on mount (setup → cleanup → setup),
+    // and the SVG-rasterize chain below is async (Image.onload → toDataURL → FabricImage
+    // .fromURL().then). Without this guard, the first (soon-to-be-disposed) invocation's
+    // callbacks can still fire after the second invocation is live, both writing into the
+    // same shared bgCanvasElRef and racing to set backgroundImage on whichever canvas
+    // instance ends up wrapping the physical <canvas> node — producing a corrupted,
+    // undersized, top-left-anchored composite instead of the real kit artwork.
+    let cancelled = false;
+
     const canvas = new Canvas(canvasElRef.current, {
       width: CANVAS_W,
       height: CANVAS_H,
@@ -261,6 +328,33 @@ export default function KitCanvasEditor({ mode }) {
     canvas.on('selection:updated', (e) => setSelectedObj(e.selected?.[0] || null));
     canvas.on('selection:cleared', () => setSelectedObj(null));
 
+    // If this side was already edited on a previous visit, pick up exactly where that edit left
+    // off (strokes, shapes, text and all) instead of re-rendering a fresh canvas from the live
+    // design — "Back" then re-opening the editor should continue the same edited kit.
+    const savedState = mode === 'kit' ? loadKitCanvasState(initialSide) : null;
+    if (savedState) {
+      canvas.loadFromJSON(savedState).then(() => {
+        if (cancelled) return;
+        canvas.requestRenderAll();
+        const bg = canvas.backgroundImage;
+        if (bg && bg._element) {
+          const bctx = bgCanvasElRef.current.getContext('2d');
+          bctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+          bctx.drawImage(bg._element, 0, 0, CANVAS_W, CANVAS_H);
+        }
+        pushHistorySnapshot();
+        setReady(true);
+      }).catch(() => {
+        // StrictMode's double-invoke can dispose this exact canvas instance while
+        // loadFromJSON's own internal steps are still mid-flight on it — that rejects here
+        // rather than reaching the .then() above, so `cancelled` alone can't guard it.
+      });
+      return () => {
+        cancelled = true;
+        canvas.dispose();
+      };
+    }
+
     // Load the user's actual current kit as the drawing surface — done here, in the same
     // effect that creates the canvas, so fabricRef.current is guaranteed to exist already.
     // (Previously this lived in a separate useLayoutEffect, which — since layout effects run
@@ -277,53 +371,72 @@ export default function KitCanvasEditor({ mode }) {
       const [, , vbWidth, vbHeight] = (viewBox || '0 0 300 360').split(' ').map(Number);
       clone.setAttribute('width', vbWidth);
       clone.setAttribute('height', vbHeight);
+      // The cloned inline style="width:100%;height:100%" (copied verbatim by cloneNode) takes
+      // CSS-vs-presentation-attribute precedence over the width/height attributes above, so it
+      // must be cleared — otherwise the browser still can't resolve the percentage with no
+      // parent and falls back to its ~300x150 default replaced-element size.
+      clone.style.removeProperty('width');
+      clone.style.removeProperty('height');
 
-      const data = new XMLSerializer().serializeToString(clone);
-      const blob = new Blob([data], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
+      inlineSvgImages(clone).then(() => {
+        if (cancelled) return;
+        const data = new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([data], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
 
-      // Rasterize the SVG ourselves onto a plain canvas at an exact, known destination size
-      // via drawImage's explicit-size form — this always stretches correctly regardless of
-      // whatever the source SVG's "natural" size quirkily comes back as. Trusting Fabric's own
-      // image-object width/height/scale for this was unreliable (kept rendering a cropped
-      // corner instead of the full kit).
-      const rawImg = new Image();
-      rawImg.onload = () => {
-        URL.revokeObjectURL(url);
-        const scale = Math.min((CANVAS_W * 0.85) / vbWidth, (CANVAS_H * 0.85) / vbHeight);
-        const drawW = vbWidth * scale;
-        const drawH = vbHeight * scale;
-        const left = (CANVAS_W - drawW) / 2;
-        const top = (CANVAS_H - drawH) / 2;
+        // Rasterize the SVG ourselves onto a plain canvas at an exact, known destination size
+        // via drawImage's explicit-size form — this always stretches correctly regardless of
+        // whatever the source SVG's "natural" size quirkily comes back as. Trusting Fabric's own
+        // image-object width/height/scale for this was unreliable (kept rendering a cropped
+        // corner instead of the full kit).
+        const rawImg = new Image();
+        rawImg.onload = () => {
+          URL.revokeObjectURL(url);
+          if (cancelled) return;
+          const scale = Math.min((CANVAS_W * 0.85) / vbWidth, (CANVAS_H * 0.85) / vbHeight);
+          const drawW = vbWidth * scale;
+          const drawH = vbHeight * scale;
+          const left = (CANVAS_W - drawW) / 2;
+          const top = (CANVAS_H - drawH) / 2;
 
-        const bctx = bgCanvasElRef.current.getContext('2d');
-        bctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-        bctx.fillStyle = themeColor('canvas-light', '#f7f7f5');
-        bctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-        bctx.drawImage(rawImg, left, top, drawW, drawH);
+          const bctx = bgCanvasElRef.current.getContext('2d');
+          bctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+          bctx.fillStyle = themeColor('canvas-light', '#f7f7f5');
+          bctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+          bctx.drawImage(rawImg, left, top, drawW, drawH);
 
-        const flatUrl = bgCanvasElRef.current.toDataURL('image/png');
-        FabricImage.fromURL(flatUrl).then(img => {
-          // Force this to stretch to exactly the canvas size, no matter what img.width/height
-          // report — that reported size has been unreliable, so stop depending on it entirely.
-          img.set({
-            left: 0,
-            top: 0,
-            scaleX: CANVAS_W / img.width,
-            scaleY: CANVAS_H / img.height,
-            selectable: false,
-            evented: false,
+          const flatUrl = bgCanvasElRef.current.toDataURL('image/png');
+          FabricImage.fromURL(flatUrl).then(img => {
+            if (cancelled) return;
+            // Force this to stretch to exactly the canvas size, no matter what img.width/height
+            // report — that reported size has been unreliable, so stop depending on it entirely.
+            // originX/originY must be pinned to 'left'/'top' explicitly: Fabric images default to
+            // center-origin, so left:0/top:0 would otherwise place the image's *center* — not its
+            // corner — at the canvas origin, leaving only its bottom-right quadrant visible.
+            img.set({
+              left: 0,
+              top: 0,
+              originX: 'left',
+              originY: 'top',
+              scaleX: CANVAS_W / img.width,
+              scaleY: CANVAS_H / img.height,
+              selectable: false,
+              evented: false,
+            });
+            canvas.backgroundImage = img;
+            canvas.requestRenderAll();
+            pushHistorySnapshot();
+            setReady(true);
           });
-          canvas.backgroundImage = img;
-          canvas.requestRenderAll();
-          pushHistorySnapshot();
-          setReady(true);
-        });
-      };
-      rawImg.src = url;
+        };
+        rawImg.src = url;
+      });
     }
 
-    return () => canvas.dispose();
+    return () => {
+      cancelled = true;
+      canvas.dispose();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -359,7 +472,7 @@ export default function KitCanvasEditor({ mode }) {
 
       const url = bgCanvasElRef.current.toDataURL('image/png');
       FabricImage.fromURL(url).then(img => {
-        img.set({ left: 0, top: 0, selectable: false, evented: false });
+        img.set({ left: 0, top: 0, originX: 'left', originY: 'top', selectable: false, evented: false });
         canvas.backgroundImage = img;
         canvas.requestRenderAll();
         pushHistorySnapshot();
@@ -463,7 +576,7 @@ export default function KitCanvasEditor({ mode }) {
 
   const exportPNG = () => {
     const canvas = fabricRef.current;
-    const url = canvas.toDataURL({ format: 'png', multiplier: 2 });
+    const url = canvas.toDataURL({ format: 'png', multiplier: EXPORT_MULTIPLIER });
     const a = document.createElement('a');
     a.href = url;
     a.download = `kit-${mode === 'logo' ? 'drawing' : 'design'}-${Date.now()}.png`;
@@ -473,17 +586,23 @@ export default function KitCanvasEditor({ mode }) {
 
   const useAsLogo = () => {
     const canvas = fabricRef.current;
-    const url = canvas.toDataURL({ format: 'png', multiplier: 2 });
+    const url = canvas.toDataURL({ format: 'png', multiplier: EXPORT_MULTIPLIER });
     try { localStorage.setItem(DRAWN_LOGO_KEY, url); } catch { /* storage unavailable */ }
     navigate('/customize');
   };
 
-  /** In kit-editing mode, save the current canvas as the final edited kit before leaving,
-   *  so it's what gets used at checkout/order — not just a discarded in-progress edit. */
+  /** In kit-editing mode, save the current canvas as the final edited kit before leaving —
+   *  a flattened PNG so it's what gets used at checkout/order, and the full Fabric canvas state
+   *  so reopening the editor for this side later continues the same edit instead of resetting. */
   const goBackToStudio = () => {
     if (mode === 'kit' && fabricRef.current) {
-      const url = fabricRef.current.toDataURL({ format: 'png', multiplier: 2 });
-      try { localStorage.setItem(EDITED_KIT_KEY, url); } catch { /* storage unavailable */ }
+      const url = fabricRef.current.toDataURL({ format: 'png', multiplier: EXPORT_MULTIPLIER });
+      saveEditedKitImage(initialSide, url);
+      saveKitCanvasState(initialSide, fabricRef.current.toJSON());
+      // Carry the side back so Customize reopens on the same side just edited — otherwise its
+      // own side state always defaults to 'front' on remount, showing the wrong side's result.
+      navigate(`/customize?side=${initialSide}`);
+      return;
     }
     navigate('/customize');
   };
@@ -510,7 +629,7 @@ export default function KitCanvasEditor({ mode }) {
     <div className="customizer draw">
       {/* Off-screen: renders the user's real, current kit so we can snapshot it as the drawing surface */}
       <div ref={hiddenPreviewRef} className="draw__hidden-preview" aria-hidden="true">
-        <KitPreview {...design} side="front" />
+        <KitPreview {...design} side={initialSide} />
       </div>
 
       <div className="customizer__topbar">
@@ -522,6 +641,9 @@ export default function KitCanvasEditor({ mode }) {
           >
             <IconChevronLeft /> Back
           </button>
+          {mode === 'kit' && (
+            <span className="draw__title">Editing {initialSide === 'back' ? 'Back' : 'Front'}</span>
+          )}
         </div>
         <div className="customizer__topbar-right">
           <button className="customizer__iconbtn" onClick={handleUndo} disabled={!canUndo} title="Undo"><IconUndo /></button>
@@ -564,7 +686,7 @@ export default function KitCanvasEditor({ mode }) {
         </div>
 
         <main className="customizer__canvas">
-          <div ref={canvasCardRef} className={`draw__canvas-card${mode === 'kit' ? ' draw__canvas-card--kit' : ''}`}>
+          <div ref={canvasCardRef} className="draw__canvas-card">
             {!ready && <div className="draw__loading">Loading your kit…</div>}
             <canvas ref={canvasElRef} />
             {toast && <div className="draw__toast">{toast}</div>}

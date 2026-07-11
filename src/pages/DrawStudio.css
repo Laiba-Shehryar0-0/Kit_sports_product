@@ -37,32 +37,26 @@
   color: var(--light-200);
 }
 
+/* Sized and framed exactly like .customizer__canvas-card on the main Customize page, so the
+   kit doesn't visually "jump" in scale/proportion when opening the editor from there. */
 .draw__canvas-card {
   position: relative;
-  background: var(--canvas-light);
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 4 / 3.1;
+  background: linear-gradient(160deg, var(--canvas-light) 0%, var(--canvas-light-dark) 100%);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: var(--space-4);
-  line-height: 0;
-  max-height: calc(100vh - 260px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Fabric sets its own inline pixel width/height on the canvas element (matching the editor's
+   fixed 300x360 backing resolution — see CANVAS_W/CANVAS_H), so no CSS sizing is needed here;
+   the flex-centered card above places it at its natural size, same as .customizer__preview-kit. */
 .draw__canvas-card canvas {
   border-radius: var(--radius-md);
-  max-height: calc(100vh - 260px - (var(--space-4) * 2));
-  width: auto;
-  display: block;
-}
-
-/* Kit Editor only — bigger canvas, using the room freed up now that there's no hint text below it.
-   Kept a margin below the exact math (vs. .customizer__canvas's own available space) so it never
-   nudges into overflow and triggers that container's scrollbar. */
-.draw__canvas-card--kit {
-  max-height: calc(100vh - 210px);
-}
-
-.draw__canvas-card--kit canvas {
-  max-height: calc(100vh - 210px - (var(--space-4) * 2));
 }
 
 .draw__toast {
