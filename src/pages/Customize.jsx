@@ -24,7 +24,8 @@ import footballShortsImg from '../assets/football-shorts-front.png';
 import footballShortsBackImg from '../assets/football-shorts-back.png';
 import goalkeeperKitImg from '../assets/goalkeeperkit-front.png';
 import goalkeeperKitBackImg from '../assets/goalkeeperkit-back.png';
-import basketballJerseyImg from '../assets/Basketball-Jersey.png';
+import basketballJerseyImg from '../assets/basketball-jersey-front.png';
+import basketballJerseyBackImg from '../assets/basketball-jersey-back.png';
 import basketballShortsImg from '../assets/basketball-shorts-front.png';
 import basketballShortsBackImg from '../assets/basketball-shorts-back.png';
 import basketballShoesImg from '../assets/basketball-shoes.png';
@@ -70,7 +71,7 @@ const SPORT_KIT_GROUPS = [
   {
     id: 'basketball', label: 'Basketball',
     items: [
-      { id: 'basketball-jersey', label: 'Basketball Jersey', image: basketballJerseyImg, kitType: 'jersey' },
+      { id: 'basketball-jersey', label: 'Basketball Jersey', image: basketballJerseyImg, imageBack: basketballJerseyBackImg, kitType: 'jersey' },
       { id: 'basketball-shorts', label: 'Basketball Shorts', image: basketballShortsImg, imageBack: basketballShortsBackImg, kitType: 'shorts' },
       { id: 'basketball-shoes',  label: 'Basketball Shoes',  image: basketballShoesImg,  kitType: 'socks' },
       { id: 'warmup-suit',       label: 'Warm-up Suit',      image: warmupSuitImg,       imageBack: warmupSuitBackImg,       kitType: 'jumper' },

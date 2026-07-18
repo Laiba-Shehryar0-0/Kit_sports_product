@@ -6,7 +6,7 @@ import cricketSweaterImg  from '../../assets/cricket-sweater.png';
 import footballJerseyImg  from '../../assets/football-jersey.png';
 import footballShortsImg  from '../../assets/football-shorts-front.png';
 import goalkeeperKitImg   from '../../assets/goalkeeperkit-front.png';
-import basketballJerseyImg from '../../assets/Basketball-Jersey.png';
+import basketballJerseyImg from '../../assets/basketball-jersey-front.png';
 import basketballShortsImg from '../../assets/basketball-shorts-front.png';
 import trainingTShirtImg  from '../../assets/training-T-shit.png';
 import trackJacketImg     from '../../assets/Track-jacket.png';
