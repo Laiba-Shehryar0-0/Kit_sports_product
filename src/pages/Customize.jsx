@@ -15,25 +15,36 @@ import {
 } from '../customize/icons';
 import ColorPicker from '../customize/ColorPicker';
 import cricketShirtImg from '../assets/cricket-shirt.png';
-import cricketTrousersImg from '../assets/cricket-trousers.png';
+import cricketTrousersImg from '../assets/cricket-trousers-front.png';
+import cricketTrousersBackImg from '../assets/cricket-trousers-back.png';
 import cricketSweaterImg from '../assets/cricket-sweater.png';
 import cricketCapImg from '../assets/cricket-cap.png';
 import footballJerseyImg from '../assets/football-jersey.png';
-import footballShortsImg from '../assets/football-shorts.png';
-import goalkeeperKitImg from '../assets/goalkeeper-kit.png';
+import footballShortsImg from '../assets/football-shorts-front.png';
+import footballShortsBackImg from '../assets/football-shorts-back.png';
+import goalkeeperKitImg from '../assets/goalkeeperkit-front.png';
+import goalkeeperKitBackImg from '../assets/goalkeeperkit-back.png';
 import basketballJerseyImg from '../assets/Basketball-Jersey.png';
-import basketballShortsImg from '../assets/basketball-shorts.png';
+import basketballShortsImg from '../assets/basketball-shorts-front.png';
+import basketballShortsBackImg from '../assets/basketball-shorts-back.png';
 import basketballShoesImg from '../assets/basketball-shoes.png';
 import trainingTShirtImg from '../assets/training-T-shit.png';
-import trainingShortsImg from '../assets/training-shorts.png';
-import trainingVestImg from '../assets/Training-vest.png';
-import tracksuitImg from '../assets/tracksuit.png';
-import warmupSuitImg from '../assets/Warm-up-suit.png';
-import trainingBibImg from '../assets/Training-bib.png';
+import trainingShortsImg from '../assets/training-shorts-front.png';
+import trainingShortsBackImg from '../assets/training-shorts-back.png';
+import trainingVestImg from '../assets/training-vest-front.png';
+import trainingVestBackImg from '../assets/training-vest-back.png';
+import tracksuitImg from '../assets/tracksuit-front.png';
+import tracksuitBackImg from '../assets/tracksuit-back.png';
+import warmupSuitImg from '../assets/warmup-suit-front.png';
+import warmupSuitBackImg from '../assets/warmup-suit-back.png';
+import trainingBibImg from '../assets/training-bib-front.png';
+import trainingBibBackImg from '../assets/training-bib-back.png';
 import boxingKitImg from '../assets/boxing-kit.png';
 import hockeyKitImg from '../assets/hockey-kit.png';
-import cyclingKitImg from '../assets/cycling-kit.png';
-import rugbyKitImg from '../assets/rudby-kit.png';
+import cyclingKitImg from '../assets/cycling-kit-front.png';
+import cyclingKitBackImg from '../assets/cycling-kit-back.png';
+import rugbyKitImg from '../assets/rugby-kit-front.png';
+import rugbyKitBackImg from '../assets/rugby-kit-back.png';
 import './Customize.css';
 
 /** Sport → specific product catalog, each mapped to a KIT_TYPES id so the SVG preview knows what to render */
@@ -42,7 +53,7 @@ const SPORT_KIT_GROUPS = [
     id: 'cricket', label: 'Cricket',
     items: [
       { id: 'cricket-shirt',    label: 'Cricket Shirt',    image: cricketShirtImg,    kitType: 'polo' },
-      { id: 'cricket-trousers', label: 'Cricket Trousers', image: cricketTrousersImg, kitType: 'shorts' },
+      { id: 'cricket-trousers', label: 'Cricket Trousers', image: cricketTrousersImg, imageBack: cricketTrousersBackImg, kitType: 'shorts' },
       { id: 'cricket-sweater',  label: 'Cricket Sweater',  image: cricketSweaterImg,  kitType: 'jumper' },
       { id: 'cricket-cap',      label: 'Cricket Cap',      image: cricketCapImg,      kitType: 'cap' },
     ],
@@ -51,27 +62,27 @@ const SPORT_KIT_GROUPS = [
     id: 'football', label: 'Football',
     items: [
       { id: 'football-jersey', label: 'Football Jersey', image: footballJerseyImg, kitType: 'jersey' },
-      { id: 'football-shorts', label: 'Football Shorts', image: footballShortsImg, kitType: 'shorts' },
-      { id: 'goalkeeper-kit',  label: 'Goalkeeper Kit',  image: goalkeeperKitImg,  kitType: 'jersey' },
-      { id: 'training-bib',    label: 'Training Bib',    image: trainingBibImg,    kitType: 'jersey' },
+      { id: 'football-shorts', label: 'Football Shorts', image: footballShortsImg, imageBack: footballShortsBackImg, kitType: 'shorts' },
+      { id: 'goalkeeper-kit',  label: 'Goalkeeper Kit',  image: goalkeeperKitImg,  imageBack: goalkeeperKitBackImg,  kitType: 'jersey' },
+      { id: 'training-bib',    label: 'Training Bib',    image: trainingBibImg,    imageBack: trainingBibBackImg,    kitType: 'jersey' },
     ],
   },
   {
     id: 'basketball', label: 'Basketball',
     items: [
       { id: 'basketball-jersey', label: 'Basketball Jersey', image: basketballJerseyImg, kitType: 'jersey' },
-      { id: 'basketball-shorts', label: 'Basketball Shorts', image: basketballShortsImg, kitType: 'shorts' },
+      { id: 'basketball-shorts', label: 'Basketball Shorts', image: basketballShortsImg, imageBack: basketballShortsBackImg, kitType: 'shorts' },
       { id: 'basketball-shoes',  label: 'Basketball Shoes',  image: basketballShoesImg,  kitType: 'socks' },
-      { id: 'warmup-suit',       label: 'Warm-up Suit',      image: warmupSuitImg,       kitType: 'jumper' },
+      { id: 'warmup-suit',       label: 'Warm-up Suit',      image: warmupSuitImg,       imageBack: warmupSuitBackImg,       kitType: 'jumper' },
     ],
   },
   {
     id: 'training', label: 'Training',
     items: [
       { id: 'training-tshirt', label: 'Training T-Shirt', image: trainingTShirtImg, kitType: 'jersey' },
-      { id: 'training-shorts', label: 'Training Shorts',  image: trainingShortsImg, kitType: 'shorts' },
-      { id: 'training-vest',   label: 'Training Vest',    image: trainingVestImg,   kitType: 'jersey' },
-      { id: 'tracksuit',       label: 'Tracksuit',        image: tracksuitImg,      kitType: 'jumper' },
+      { id: 'training-shorts', label: 'Training Shorts',  image: trainingShortsImg, imageBack: trainingShortsBackImg, kitType: 'shorts' },
+      { id: 'training-vest',   label: 'Training Vest',    image: trainingVestImg,   imageBack: trainingVestBackImg,   kitType: 'jersey' },
+      { id: 'tracksuit',       label: 'Tracksuit',        image: tracksuitImg,      imageBack: tracksuitBackImg,      kitType: 'jumper' },
     ],
   },
   {
@@ -79,11 +90,19 @@ const SPORT_KIT_GROUPS = [
     items: [
       { id: 'boxing-kit',  label: 'Boxing Kit',  image: boxingKitImg,  kitType: 'shorts' },
       { id: 'hockey-kit',  label: 'Hockey Kit',  image: hockeyKitImg,  kitType: 'jersey' },
-      { id: 'cycling-kit', label: 'Cycling Kit', image: cyclingKitImg, kitType: 'jersey' },
-      { id: 'rugby-kit',   label: 'Rugby Kit',   image: rugbyKitImg,   kitType: 'jersey' },
+      { id: 'cycling-kit', label: 'Cycling Kit', image: cyclingKitImg, imageBack: cyclingKitBackImg, kitType: 'jersey' },
+      { id: 'rugby-kit',   label: 'Rugby Kit',   image: rugbyKitImg,   imageBack: rugbyKitBackImg,   kitType: 'jersey' },
     ],
   },
 ];
+
+function findKitItem(slug) {
+  for (const group of SPORT_KIT_GROUPS) {
+    const item = group.items.find(it => it.id === slug);
+    if (item) return { group, item };
+  }
+  return null;
+}
 
 const TABS = [
   { id: 'kit',    label: 'Kit',    icon: <IconKit /> },
@@ -106,7 +125,13 @@ const DEFAULT_LAYER_ORDER = [
 
 export default function Customize() {
   const [searchParams] = useSearchParams();
-  const [design, setDesign, { undo, redo, canUndo, canRedo }] = useHistoryState(loadStoredDesign);
+  // Coming from a Kits catalog card carries ?kit=<slug> so this opens straight into that kit
+  // instead of whatever was last customized.
+  const [design, setDesign, { undo, redo, canUndo, canRedo }] = useHistoryState(() => {
+    const stored = loadStoredDesign();
+    const match = findKitItem(searchParams.get('kit'));
+    return match ? { ...stored, kitType: match.item.kitType, kitProduct: match.item.label } : stored;
+  });
   const [activeTab, setActiveTab] = useState('kit');
   const [activeTool, setActiveTool] = useState('select');
   const [applyTarget, setApplyTarget] = useState('body');
@@ -364,7 +389,7 @@ export default function Customize() {
 
           <div className="customizer__panel">
             {activeTab === 'kit' && (
-              <KitPanel design={design} patch={patch} />
+              <KitPanel design={design} patch={patch} initialKitSlug={searchParams.get('kit')} side={side} />
             )}
 
             {activeTab === 'colors' && (
@@ -460,8 +485,8 @@ function UnitDropdown({ value, onChange }) {
   );
 }
 
-function KitPanel({ design, patch }) {
-  const [expandedSport, setExpandedSport] = useState(null);
+function KitPanel({ design, patch, initialKitSlug, side }) {
+  const [expandedSport, setExpandedSport] = useState(() => findKitItem(initialKitSlug)?.group.id ?? null);
   const activeGroup = SPORT_KIT_GROUPS.find(g => g.id === expandedSport);
   const [showAllTemplates, setShowAllTemplates] = useState(false);
   const visibleTemplates = showAllTemplates ? DESIGN_TEMPLATES : DESIGN_TEMPLATES.slice(0, 4);
@@ -495,7 +520,7 @@ function KitPanel({ design, patch }) {
                   onClick={() => patch({ kitType: item.kitType, kitProduct: item.label })}
                   className={`panel__kit-btn${design.kitProduct === item.label ? ' panel__kit-btn--active' : ''}`}
                 >
-                  <img src={item.image} alt={item.label} className="panel__kit-thumb" />
+                  <img src={side === 'back' && item.imageBack ? item.imageBack : item.image} alt={item.label} className="panel__kit-thumb" />
                   <span>{item.label}</span>
                 </button>
               ))}

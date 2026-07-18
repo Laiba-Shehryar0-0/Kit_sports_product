@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import cricketShirtImg    from '../../assets/cricket-shirt.png';
-import cricketTrousersImg from '../../assets/cricket-trousers.png';
+import cricketTrousersImg from '../../assets/cricket-trousers-front.png';
 import cricketSweaterImg  from '../../assets/cricket-sweater.png';
 import footballJerseyImg  from '../../assets/football-jersey.png';
-import footballShortsImg  from '../../assets/football-shorts.png';
-import goalkeeperKitImg   from '../../assets/goalkeeper-kit.png';
+import footballShortsImg  from '../../assets/football-shorts-front.png';
+import goalkeeperKitImg   from '../../assets/goalkeeperkit-front.png';
 import basketballJerseyImg from '../../assets/Basketball-Jersey.png';
-import basketballShortsImg from '../../assets/basketball-shorts.png';
+import basketballShortsImg from '../../assets/basketball-shorts-front.png';
 import trainingTShirtImg  from '../../assets/training-T-shit.png';
 import trackJacketImg     from '../../assets/Track-jacket.png';
-import trainingShortsImg  from '../../assets/training-shorts.png';
-import trainingVestImg    from '../../assets/Training Vest.png';
+import trainingShortsImg  from '../../assets/training-shorts-front.png';
+import trainingVestImg    from '../../assets/training-vest-front.png';
 import './ProductGallery.css';
 
 const PRODUCTS = [

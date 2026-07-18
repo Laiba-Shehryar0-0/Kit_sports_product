@@ -391,9 +391,9 @@
   align-items: center;
   gap: 6px;
   padding: var(--space-3) var(--space-2);
-  background: var(--bg-600);
+  background: var(--bg-700);
   border: 1.5px solid var(--border-dark);
-  color: var(--light-500);
+  color: var(--light-400);
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 600;
@@ -404,19 +404,19 @@
   transition: all 200ms ease;
 }
 
-.panel__kit-thumb { width: 42px; height: 42px; object-fit: contain; filter: brightness(0) invert(1); }
+.panel__kit-thumb { width: 42px; height: 42px; object-fit: contain; }
 
 .panel__kit-btn:hover {
   border-color: var(--light-400);
   color: var(--light-100);
-  background: var(--bg-500);
+  background: var(--bg-600);
   transform: translateY(-2px);
 }
 
 .panel__kit-btn--active {
-  border-color: var(--light-100);
+  border-color: var(--red);
   color: var(--light-100);
-  background: rgba(var(--white-rgb), 0.08);
+  background: var(--bg-600);
 }
 
 /* Sport category grid — text-only boxes shown before a sport is picked */

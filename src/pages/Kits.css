@@ -121,7 +121,7 @@
 .kit-detail-card__image {
   position: relative;
   aspect-ratio: 1.2;
-  background: var(--kit-color, var(--bg-500));
+  background: var(--bg-700);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,11 +133,9 @@
 }
 
 .kit-detail-card__img {
-  width: 110px;
-  height: 110px;
+  width: 175px;
+  height: 175px;
   object-fit: contain;
-  filter: invert(1);
-  mix-blend-mode: screen;
 }
 
 .kit-detail-card__sport {
