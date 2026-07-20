@@ -84,8 +84,8 @@ function PageLoading() {
       alignItems: 'center',
       justifyContent: 'center',
       paddingTop: '72px',
-      background: 'var(--bg-800)',
-      color: 'var(--light-500)',
+      background: 'var(--color-bg-800)',
+      color: 'var(--color-light-500)',
       fontSize: '13px',
       letterSpacing: '0.5px',
     }}>
@@ -104,14 +104,14 @@ function NotFound() {
       justifyContent: 'center',
       paddingTop: '72px',
       gap: '16px',
-      background: 'var(--bg-800)',
-      color: 'var(--light-100)',
+      background: 'var(--color-bg-800)',
+      color: 'var(--color-light-100)',
       textAlign: 'center',
     }}>
       <span style={{ fontSize: '4rem' }}>🏆</span>
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '4rem', letterSpacing: '4px' }}>404</h1>
-      <p style={{ color: 'var(--light-500)' }}>Page not found.</p>
-      <a href="/" style={{ color: 'var(--gold)' }}>← Back to Home</a>
+      <p style={{ color: 'var(--color-light-500)' }}>Page not found.</p>
+      <a href="/" style={{ color: 'var(--color-gold)' }}>← Back to Home</a>
     </div>
   );
 }

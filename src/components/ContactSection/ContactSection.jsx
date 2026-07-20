@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useInView from '../../hooks/useInView';
-import './ContactSection.css';
+
+const fieldInputCls = 'bg-bg-600 border border-border-dark text-light-100 py-[12px] px-4 text-[0.9rem] transition-[border-color_150ms_ease,box-shadow_150ms_ease] outline-none appearance-none rounded-none placeholder:text-light-600 focus:border-red focus:shadow-[0_0_0_3px_rgba(204,0,0,0.12)]';
 
 const SPORTS = ['Cricket', 'Football', 'Basketball', 'Training', 'Other'];
 
@@ -54,21 +55,29 @@ export default function ContactSection() {
   };
 
   return (
-    <section className="contact" id="contact">
+    <section className="bg-bg-700 py-24" id="contact">
       <div className="container">
-        <div className={`contact__header anim-fade-up${headerVisible ? ' is-visible' : ''}`} ref={headerRef}>
+        <div
+          className={`flex flex-col items-start gap-4 mb-12 anim-fade-up${headerVisible ? ' is-visible' : ''}`}
+          ref={headerRef}
+        >
           <h2 className="section-title">Get In Touch</h2>
           <p className="section-subtitle">
             Fill in the form and we'll get back to you shortly
           </p>
         </div>
 
-        <div className="contact__grid">
+        <div className="grid grid-cols-[1.4fr_1fr] gap-12 items-start max-[900px]:grid-cols-1">
           {/* Form */}
-          <form className={`contact__form anim-fade-left${formVisible ? ' is-visible' : ''}`} onSubmit={handleSubmit} noValidate ref={formRef}>
-            <div className="contact__row">
-              <div className="contact__field">
-                <label htmlFor="name">Full Name <span aria-hidden="true">*</span></label>
+          <form
+            className={`flex flex-col gap-5 anim-fade-left${formVisible ? ' is-visible' : ''}`}
+            onSubmit={handleSubmit} noValidate ref={formRef}
+          >
+            <div className="grid grid-cols-2 gap-5 max-[900px]:grid-cols-1">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="name" className="text-[11px] font-bold tracking-[1.5px] uppercase text-light-500">
+                  Full Name <span aria-hidden="true" className="text-red">*</span>
+                </label>
                 <input
                   id="name"
                   name="name"
@@ -76,11 +85,14 @@ export default function ContactSection() {
                   placeholder="Your full name"
                   value={form.name}
                   onChange={handleChange}
+                  className={fieldInputCls}
                 />
-                {errors.name && <span className="contact__error">{errors.name}</span>}
+                {errors.name && <span className="text-[0.78rem] text-[#ff5555] mt-1 block">{errors.name}</span>}
               </div>
-              <div className="contact__field">
-                <label htmlFor="email">Email Address <span aria-hidden="true">*</span></label>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="email" className="text-[11px] font-bold tracking-[1.5px] uppercase text-light-500">
+                  Email Address <span aria-hidden="true" className="text-red">*</span>
+                </label>
                 <input
                   id="email"
                   name="email"
@@ -88,14 +100,15 @@ export default function ContactSection() {
                   placeholder="your@email.com"
                   value={form.email}
                   onChange={handleChange}
+                  className={fieldInputCls}
                 />
-                {errors.email && <span className="contact__error">{errors.email}</span>}
+                {errors.email && <span className="text-[0.78rem] text-[#ff5555] mt-1 block">{errors.email}</span>}
               </div>
             </div>
 
-            <div className="contact__row">
-              <div className="contact__field">
-                <label htmlFor="phone">Phone Number</label>
+            <div className="grid grid-cols-2 gap-5 max-[900px]:grid-cols-1">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="phone" className="text-[11px] font-bold tracking-[1.5px] uppercase text-light-500">Phone Number</label>
                 <input
                   id="phone"
                   name="phone"
@@ -103,15 +116,17 @@ export default function ContactSection() {
                   placeholder="+92 000 0000000"
                   value={form.phone}
                   onChange={handleChange}
+                  className={fieldInputCls}
                 />
               </div>
-              <div className="contact__field">
-                <label htmlFor="sport">Sport Type</label>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="sport" className="text-[11px] font-bold tracking-[1.5px] uppercase text-light-500">Sport Type</label>
                 <select
                   id="sport"
                   name="sport"
                   value={form.sport}
                   onChange={handleChange}
+                  className={`${fieldInputCls} cursor-pointer bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2712%27%20height=%278%27%20viewBox=%270%200%2012%208%27%3E%3Cpath%20d=%27M1%201l5%205%205-5%27%20stroke=%27%23888%27%20stroke-width=%271.5%27%20fill=%27none%27/%3E%3C/svg%3E')] bg-no-repeat [background-position:right_16px_center] pr-[40px] [&>option]:bg-bg-600 [&>option]:text-light-100`}
                 >
                   <option value="">Select your sport</option>
                   {SPORTS.map(s => (
@@ -121,8 +136,10 @@ export default function ContactSection() {
               </div>
             </div>
 
-            <div className="contact__field">
-              <label htmlFor="message">Message <span aria-hidden="true">*</span></label>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="message" className="text-[11px] font-bold tracking-[1.5px] uppercase text-light-500">
+                Message <span aria-hidden="true" className="text-red">*</span>
+              </label>
               <textarea
                 id="message"
                 name="message"
@@ -130,30 +147,34 @@ export default function ContactSection() {
                 placeholder="Tell us about your requirements..."
                 value={form.message}
                 onChange={handleChange}
+                className={`${fieldInputCls} resize-y min-h-[120px]`}
               />
-              {errors.message && <span className="contact__error">{errors.message}</span>}
+              {errors.message && <span className="text-[0.78rem] text-[#ff5555] mt-1 block">{errors.message}</span>}
             </div>
 
-            <button type="submit" className="btn btn-red contact__submit">
+            <button type="submit" className="btn btn-red w-fit py-[14px] px-10 bg-[#a00000] hover:bg-[#880000]">
               {submitted ? '✓ Message Sent!' : 'Send Message'}
             </button>
 
             {submitted && (
-              <p className="contact__success">
+              <p className="text-[0.875rem] text-[#4caf50] font-semibold">
                 Thanks! We'll get back to you within 24 hours.
               </p>
             )}
           </form>
 
           {/* Info */}
-          <div className={`contact__info anim-fade-right${infoVisible ? ' is-visible' : ''}`} ref={infoRef}>
+          <div
+            className={`flex flex-col gap-5 anim-fade-right${infoVisible ? ' is-visible' : ''}`}
+            ref={infoRef}
+          >
             {CONTACT_INFO.map(({ icon, label, lines }) => (
-              <div key={label} className="contact__info-card">
-                <span className="contact__info-icon">{icon}</span>
+              <div key={label} className="flex items-start gap-4 bg-bg-600 border border-border-dark p-5">
+                <span className="text-[1.4rem] flex-shrink-0 mt-[2px]">{icon}</span>
                 <div>
-                  <strong>{label}</strong>
+                  <strong className="block text-[11px] font-bold tracking-[1.5px] uppercase text-gold mb-2">{label}</strong>
                   {lines.map((line, i) => (
-                    <p key={i}>{line}</p>
+                    <p key={i} className="text-[0.875rem] text-light-400 leading-[1.65]">{line}</p>
                   ))}
                 </div>
               </div>
@@ -163,7 +184,7 @@ export default function ContactSection() {
               href="https://wa.me/923346688701"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn contact__whatsapp"
+              className="btn w-full justify-center py-[14px] text-[13px] bg-[#0d5c2e] text-light-100 hover:bg-[#0a4422]"
             >
               Chat on WhatsApp
             </a>

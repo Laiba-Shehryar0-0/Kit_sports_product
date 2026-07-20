@@ -1,4 +1,9 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
+import {
+  colorPickerCls, colorPickerSvCls, colorPickerSvHandleCls, colorPickerHueCls,
+  colorPickerHueHandleCls, colorPickerHexRowCls, colorPickerSwatchCls,
+  inputCls, inputHexCls,
+} from './customizerClasses';
 
 function hexToRgb(hex) {
   const raw = hex.replace('#', '');
@@ -104,26 +109,26 @@ export default function ColorPicker({ value, onChange }) {
   const pureHueHex = hsvToHex(hsv.h, 1, 1);
 
   return (
-    <div className="color-picker">
+    <div className={colorPickerCls}>
       <div
         ref={svRef}
-        className="color-picker__sv"
-        style={{ background: `linear-gradient(to top, var(--black), transparent), linear-gradient(to right, var(--light-100), transparent), ${pureHueHex}` }}
+        className={colorPickerSvCls}
+        style={{ background: `linear-gradient(to top, var(--color-black), transparent), linear-gradient(to right, var(--color-light-100), transparent), ${pureHueHex}` }}
         onPointerDown={drag(updateFromSV)}
       >
         <div
-          className="color-picker__sv-handle"
+          className={colorPickerSvHandleCls}
           style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%`, background: value }}
         />
       </div>
-      <div ref={hueRef} className="color-picker__hue" onPointerDown={drag((x) => updateFromHue(x))}>
-        <div className="color-picker__hue-handle" style={{ left: `${(hsv.h / 360) * 100}%`, background: pureHueHex }} />
+      <div ref={hueRef} className={colorPickerHueCls} onPointerDown={drag((x) => updateFromHue(x))}>
+        <div className={colorPickerHueHandleCls} style={{ left: `${(hsv.h / 360) * 100}%`, background: pureHueHex }} />
       </div>
-      <div className="color-picker__hex-row">
-        <span className="color-picker__swatch" style={{ background: value }} />
+      <div className={colorPickerHexRowCls}>
+        <span className={colorPickerSwatchCls} style={{ background: value }} />
         <input
           type="text"
-          className="panel__input panel__input--hex"
+          className={`${inputCls} ${inputHexCls}`}
           value={value}
           onChange={e => /^#[0-9a-fA-F]{0,6}$/.test(e.target.value) && onChange(e.target.value)}
         />

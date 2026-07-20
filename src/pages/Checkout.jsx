@@ -9,7 +9,9 @@ import {
   IconChevronLeft, IconLock, IconTruck, IconCard, IconBank, IconCash,
   IconShield, IconCheck, IconMinus, IconPlus,
 } from '../customize/icons';
-import './Checkout.css';
+
+const inputCls = 'bg-bg-600 border border-border-dark text-light-100 py-[10px] px-4 text-[0.9rem] outline-none w-full rounded-sm transition-[border-color_150ms_ease] focus:border-gold placeholder:text-light-700';
+const fieldLabelCls = 'text-[11px] font-bold tracking-[0.8px] uppercase text-light-600';
 
 const STEPS = [
   { id: 1, label: 'Design',    status: 'Completed' },
@@ -97,30 +99,30 @@ export default function Checkout() {
     }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
-      document.querySelector('.checkout__field--error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.querySelector('[data-field-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     setPlaced(true);
   }, [contact, address, paymentId, card]);
 
   return (
-    <div className="checkout">
-      <div className="checkout__header">
-        <Link to="/customize" className="checkout__back-link">
+    <div className="min-h-[calc(100vh-72px)] mt-[72px] bg-bg-800 pb-16">
+      <div className="flex items-center justify-between py-4 px-6 bg-bg-900 border-b border-border-dark max-[640px]:py-3 max-[640px]:px-4">
+        <Link to="/customize" className="inline-flex items-center gap-[6px] text-light-300 text-[13px] font-bold tracking-[0.5px] uppercase transition-[color_150ms_ease] hover:text-gold">
           <IconChevronLeft /> Back to Studio
         </Link>
-        <span className="checkout__secure-badge"><IconLock /> Secure Checkout</span>
+        <span className="inline-flex items-center gap-[6px] text-light-500 text-[12px] font-bold tracking-[1px] uppercase"><IconLock /> Secure Checkout</span>
       </div>
 
       <Stepper />
 
-      <div className="checkout__body">
-        <main className="checkout__main">
+      <div className="grid grid-cols-[1fr_360px] gap-6 max-w-[1180px] mx-auto px-6 items-start max-[980px]:grid-cols-1">
+        <main className="flex flex-col gap-5 min-w-0">
           <Card step={1} title="Kit Summary">
-            <div className="checkout__kit-summary">
-              <div className="checkout__kit-thumb">
+            <div className="flex gap-5 max-[640px]:flex-col">
+              <div className="w-[110px] h-[110px] flex-shrink-0 bg-[linear-gradient(160deg,var(--color-canvas-light)_0%,var(--color-canvas-light-dark)_100%)] rounded-md p-2">
                 {editedKit ? (
-                  <img src={editedKit} alt="Your edited kit" className="checkout__kit-thumb-img" />
+                  <img src={editedKit} alt="Your edited kit" className="w-full h-full object-contain rounded-sm" />
                 ) : (
                   <KitPreview
                     kitType={design.kitType} bodyColor={design.bodyColor} sleeveColor={design.sleeveColor}
@@ -133,55 +135,59 @@ export default function Checkout() {
                   />
                 )}
               </div>
-              <div className="checkout__kit-facts">
+              <div className="flex-1 flex flex-col gap-[9px]">
                 <FactRow label="Kit Type" value={`${sportLabel} ${kitLabel}`} />
                 <FactRow label="Size" value={sizeDisplay} />
                 <FactRow label="Template" value={templateName} />
                 <FactRow label="Name / No." value={`${design.playerName.front || design.playerName.back || 'PLAYER'} / #${design.playerNumber.front || design.playerNumber.back || '—'}`} />
                 <FactRow label="Colors" value={
-                  <span className="checkout__color-dots">
-                    <i style={{ background: design.bodyColor }} />
-                    <i style={{ background: design.sleeveColor }} />
+                  <span className="flex gap-[6px]">
+                    <i className="w-[14px] h-[14px] rounded-full inline-block border border-[rgba(255,255,255,0.2)]" style={{ background: design.bodyColor }} />
+                    <i className="w-[14px] h-[14px] rounded-full inline-block border border-[rgba(255,255,255,0.2)]" style={{ background: design.sleeveColor }} />
                   </span>
                 } />
                 <FactRow label="Unit Price" value={formatPKR(unitPrice)} />
-                <Link to="/customize" className="checkout__edit-link">Edit in Studio</Link>
+                <Link to="/customize" className="self-start mt-1 text-gold text-[12px] font-bold underline">Edit in Studio</Link>
               </div>
             </div>
           </Card>
 
           <Card step={2} title="Quantity & Sizes">
-            <div className="checkout__qty-row">
-              <div className="checkout__field">
-                <label>Total Kits *</label>
-                <div className="checkout__stepper">
-                  <button onClick={() => setTotalKits(q => Math.max(5, q - 1))} aria-label="Decrease"><IconMinus /></button>
-                  <span>{totalKits}</span>
-                  <button onClick={() => setTotalKits(q => q + 1)} aria-label="Increase"><IconPlus /></button>
+            <div className="flex gap-6 flex-wrap">
+              <div className="flex flex-col gap-[6px]">
+                <label className={fieldLabelCls}>Total Kits *</label>
+                <div className="flex items-center gap-3 bg-bg-600 border border-border-dark rounded-sm py-[6px] px-[10px] w-fit">
+                  <button className="flex items-center justify-center w-[26px] h-[26px] rounded-full border-none bg-bg-500 text-light-100 cursor-pointer transition-[background_150ms_ease] hover:bg-gold hover:text-bg-800" onClick={() => setTotalKits(q => Math.max(5, q - 1))} aria-label="Decrease"><IconMinus /></button>
+                  <span className="min-w-[26px] text-center font-bold text-[15px]">{totalKits}</span>
+                  <button className="flex items-center justify-center w-[26px] h-[26px] rounded-full border-none bg-bg-500 text-light-100 cursor-pointer transition-[background_150ms_ease] hover:bg-gold hover:text-bg-800" onClick={() => setTotalKits(q => q + 1)} aria-label="Increase"><IconPlus /></button>
                 </div>
               </div>
-              <div className="checkout__field">
-                <label>Primary Size *</label>
-                <select value={primarySize} onChange={e => setPrimarySize(e.target.value)} className="checkout__select">
+              <div className="flex flex-col gap-[6px]">
+                <label className={fieldLabelCls}>Primary Size *</label>
+                <select value={primarySize} onChange={e => setPrimarySize(e.target.value)} className={inputCls}>
                   {SIZES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
             </div>
             {primarySize === 'Custom' && (
-              <p className="checkout__hint">Custom size: <strong>{sizeDisplay}</strong> (as entered in the Studio)</p>
+              <p className="text-[11.5px] text-light-600 leading-[1.6]">Custom size: <strong>{sizeDisplay}</strong> (as entered in the Studio)</p>
             )}
-            <p className="checkout__hint">For mixed sizes, note individual sizes in special instructions. Minimum order: 5 kits.</p>
-            <div className="checkout__preset-row">
+            <p className="text-[11.5px] text-light-600 leading-[1.6]">For mixed sizes, note individual sizes in special instructions. Minimum order: 5 kits.</p>
+            <div className="flex gap-2 flex-wrap">
               {QUANTITY_PRESETS.map(p => (
-                <button key={p.label} onClick={() => setTotalKits(p.value)} className={`checkout__pill${totalKits === p.value ? ' checkout__pill--active' : ''}`}>
+                <button
+                  key={p.label}
+                  onClick={() => setTotalKits(p.value)}
+                  className={`py-[7px] px-[14px] border-[1.5px] text-[11px] font-bold rounded-full transition-[all_180ms_ease] ${totalKits === p.value ? 'bg-gold border-gold text-bg-800' : 'bg-bg-600 border-border-dark text-light-500 hover:border-light-400 hover:text-light-100'}`}
+                >
                   {p.label}
                 </button>
               ))}
             </div>
-            <div className="checkout__field">
-              <label>Special Instructions (optional)</label>
+            <div className="flex flex-col gap-[6px]">
+              <label className={fieldLabelCls}>Special Instructions (optional)</label>
               <textarea
-                className="checkout__textarea" rows={3}
+                className={`${inputCls} resize-y [font-family:inherit]`} rows={3}
                 placeholder="e.g. 3×S, 5×M, 2×L, 1×XL or any customisation notes..."
                 value={instructions} onChange={e => setInstructions(e.target.value)}
               />
@@ -189,8 +195,8 @@ export default function Checkout() {
           </Card>
 
           <Card step={3} title="Delivery Details">
-            <h4 className="checkout__subhead">Contact Information</h4>
-            <div className="checkout__grid-2">
+            <h4 className="text-[12px] font-bold tracking-[1px] uppercase text-gold mt-2">Contact Information</h4>
+            <div className="grid grid-cols-2 gap-4 max-[640px]:grid-cols-1">
               <TextField label="First Name" required value={contact.firstName} error={errors.firstName} onChange={v => { setContactField('firstName', v); setErrors(e => ({ ...e, firstName: false })); }} />
               <TextField label="Last Name" required value={contact.lastName} error={errors.lastName} onChange={v => { setContactField('lastName', v); setErrors(e => ({ ...e, lastName: false })); }} />
               <TextField label="Email Address" required type="email" placeholder="team@club.com" value={contact.email} error={errors.email} onChange={v => { setContactField('email', v); setErrors(e => ({ ...e, email: false })); }} />
@@ -198,9 +204,9 @@ export default function Checkout() {
             </div>
             <TextField label="Club / Team Name" placeholder="e.g. FC United Sialkot" value={contact.clubName} onChange={v => setContactField('clubName', v)} />
 
-            <h4 className="checkout__subhead">Shipping Address</h4>
+            <h4 className="text-[12px] font-bold tracking-[1px] uppercase text-gold mt-2">Shipping Address</h4>
             <TextField label="Street Address" required placeholder="House #, Street, Area" value={address.street} error={errors.street} onChange={v => { setAddressField('street', v); setErrors(e => ({ ...e, street: false })); }} />
-            <div className="checkout__grid-3">
+            <div className="grid grid-cols-3 gap-4 max-[640px]:grid-cols-1">
               <TextField label="City" required value={address.city} error={errors.city} onChange={v => { setAddressField('city', v); setErrors(e => ({ ...e, city: false })); }} />
               <TextField label="Province" value={address.province} onChange={v => setAddressField('province', v)} />
               <TextField label="Postal Code" value={address.postalCode} onChange={v => setAddressField('postalCode', v)} />
@@ -209,33 +215,36 @@ export default function Checkout() {
           </Card>
 
           <Card step={4} title="Delivery Method">
-            <div className="checkout__delivery-list">
-              {DELIVERY_METHODS.map(m => (
-                <button
-                  key={m.id}
-                  onClick={() => setDeliveryId(m.id)}
-                  className={`checkout__delivery-card${deliveryId === m.id ? ' checkout__delivery-card--active' : ''}`}
-                >
-                  <span className="checkout__delivery-radio" />
-                  <span className="checkout__delivery-info">
-                    <span className="checkout__delivery-name">
-                      {m.name} {m.popular && <em className="checkout__badge-popular">Popular</em>}
+            <div className="flex flex-col gap-2">
+              {DELIVERY_METHODS.map(m => {
+                const active = deliveryId === m.id;
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setDeliveryId(m.id)}
+                    className="flex items-center gap-4 p-4 bg-bg-600 border-[1.5px] border-border-dark rounded-md cursor-pointer text-left transition-[all_180ms_ease] hover:border-light-500"
+                  >
+                    <span className={`w-[18px] h-[18px] rounded-full border-2 flex-shrink-0 relative ${active ? 'border-light-100 after:content-[\'\'] after:absolute after:inset-[3px] after:rounded-full after:bg-light-100' : 'border-border-medium'}`} />
+                    <span className="flex-1 flex flex-col gap-[3px]">
+                      <span className="text-[13.5px] font-bold text-light-100 flex items-center gap-2">
+                        {m.name} {m.popular && <em className="not-italic text-[9px] font-extrabold tracking-[0.5px] uppercase bg-red text-light-100 py-[2px] px-[7px] rounded-full">Popular</em>}
+                      </span>
+                      <span className="text-[11.5px] text-light-600">{m.days} · {m.desc}</span>
                     </span>
-                    <span className="checkout__delivery-desc">{m.days} · {m.desc}</span>
-                  </span>
-                  <span className="checkout__delivery-price">{m.priceLabel}</span>
-                </button>
-              ))}
+                    <span className="text-[13px] font-extrabold text-light-100 whitespace-nowrap">{m.priceLabel}</span>
+                  </button>
+                );
+              })}
             </div>
           </Card>
 
           <Card step={5} title="Payment">
-            <div className="checkout__payment-tabs">
+            <div className="flex gap-2">
               {PAYMENT_METHODS.map(p => (
                 <button
                   key={p.id}
                   onClick={() => setPaymentId(p.id)}
-                  className={`checkout__payment-tab${paymentId === p.id ? ' checkout__payment-tab--active' : ''}`}
+                  className={`flex-1 flex items-center justify-center gap-2 p-3 border-[1.5px] text-[12px] font-bold rounded-md cursor-pointer transition-[all_180ms_ease] ${paymentId === p.id ? 'border-light-100 text-light-100 bg-bg-600' : 'bg-bg-600 border-border-dark text-light-400 hover:border-light-400 hover:text-light-100'}`}
                 >
                   {p.id === 'card' && <IconCard />}
                   {p.id === 'bank' && <IconBank />}
@@ -246,33 +255,33 @@ export default function Checkout() {
             </div>
 
             {paymentId === 'card' && (
-              <div className="checkout__card-fields">
+              <div className="flex flex-col gap-4">
                 <TextField label="Card Number" required placeholder="1234 5678 9012 3456" value={card.number} error={errors.cardNumber} onChange={v => { setCardField('number', v); setErrors(e => ({ ...e, cardNumber: false })); }} />
-                <div className="checkout__grid-2">
+                <div className="grid grid-cols-2 gap-4 max-[640px]:grid-cols-1">
                   <TextField label="Expiry Date" required placeholder="MM / YY" value={card.expiry} error={errors.cardExpiry} onChange={v => { setCardField('expiry', v); setErrors(e => ({ ...e, cardExpiry: false })); }} />
                   <TextField label="CVV" required placeholder="•••" maxLength={4} value={card.cvv} error={errors.cardCvv} onChange={v => { setCardField('cvv', v); setErrors(e => ({ ...e, cardCvv: false })); }} />
                 </div>
                 <TextField label="Name on Card" required placeholder="Full name as on card" value={card.name} error={errors.cardName} onChange={v => { setCardField('name', v); setErrors(e => ({ ...e, cardName: false })); }} />
-                <p className="checkout__hint checkout__hint--lock"><IconLock /> Your payment details are encrypted with 256-bit SSL. We never store card data.</p>
+                <p className="text-[11.5px] text-light-600 leading-[1.6] flex items-center gap-[6px] [&>svg]:w-[13px] [&>svg]:h-[13px] [&>svg]:flex-shrink-0"><IconLock /> Your payment details are encrypted with 256-bit SSL. We never store card data.</p>
               </div>
             )}
             {paymentId === 'bank' && (
-              <p className="checkout__hint">Bank transfer details will be emailed after you place the order. Orders are produced once payment is confirmed.</p>
+              <p className="text-[11.5px] text-light-600 leading-[1.6]">Bank transfer details will be emailed after you place the order. Orders are produced once payment is confirmed.</p>
             )}
             {paymentId === 'cod' && (
-              <p className="checkout__hint">Pay in cash when your kits are delivered. A confirmation call will be made before dispatch.</p>
+              <p className="text-[11.5px] text-light-600 leading-[1.6]">Pay in cash when your kits are delivered. A confirmation call will be made before dispatch.</p>
             )}
           </Card>
         </main>
 
-        <aside className="checkout__sidebar">
-          <div className="checkout__summary-card">
-            <h3>Order Summary</h3>
+        <aside className="sticky top-[calc(72px+24px)] max-[980px]:static">
+          <div className="bg-bg-700 border border-border-dark rounded-lg p-6 flex flex-col gap-5">
+            <h3 className="font-body font-bold text-[1.15rem] tracking-[0.4px] text-light-100">Order Summary</h3>
 
-            <div className="checkout__summary-item">
-              <div className="checkout__summary-thumb">
+            <div className="flex gap-3">
+              <div className="w-14 h-14 flex-shrink-0 bg-[linear-gradient(160deg,var(--color-canvas-light)_0%,var(--color-canvas-light-dark)_100%)] rounded-sm p-1">
                 {editedKit ? (
-                  <img src={editedKit} alt="Your edited kit" className="checkout__kit-thumb-img" />
+                  <img src={editedKit} alt="Your edited kit" className="w-full h-full object-contain rounded-sm" />
                 ) : (
                   <KitPreview
                     kitType={design.kitType} bodyColor={design.bodyColor} sleeveColor={design.sleeveColor}
@@ -285,54 +294,55 @@ export default function Checkout() {
                   />
                 )}
               </div>
-              <div>
-                <strong>{sportLabel} {kitLabel} Custom</strong>
+              <div className="flex flex-col gap-[3px] text-[11.5px] text-light-600 min-w-0">
+                <strong className="text-[13px] text-light-100 font-bold">{sportLabel} {kitLabel} Custom</strong>
                 <span>{templateName} Template</span>
                 <span>#{design.playerNumber.front || design.playerNumber.back || '—'} {(design.playerName.front || design.playerName.back || 'PLAYER').toUpperCase()} · Size: {sizeDisplay} · Qty: {totalKits}</span>
               </div>
             </div>
 
-            <div className="checkout__summary-lines">
-              <div><span>Kit price (×{totalKits})</span><span>{formatPKR(kitPrice)}</span></div>
-              <div><span>{delivery.name}</span><span>{delivery.price === 0 ? 'Free' : formatPKR(delivery.price)}</span></div>
-              <div><span>Design fee</span><span className="checkout__free">FREE</span></div>
-              {promoApplied && <div><span>Promo discount</span><span className="checkout__discount">-{formatPKR(discount)}</span></div>}
+            <div className="flex flex-col gap-2 pt-4 border-t border-border-dark">
+              <div className="flex justify-between text-[12.5px] text-light-500"><span>Kit price (×{totalKits})</span><span className="text-light-200 font-semibold">{formatPKR(kitPrice)}</span></div>
+              <div className="flex justify-between text-[12.5px] text-light-500"><span>{delivery.name}</span><span className="text-light-200 font-semibold">{delivery.price === 0 ? 'Free' : formatPKR(delivery.price)}</span></div>
+              <div className="flex justify-between text-[12.5px] text-light-500"><span>Design fee</span><span className="text-gold font-bold">FREE</span></div>
+              {promoApplied && <div className="flex justify-between text-[12.5px] text-light-500"><span>Promo discount</span><span className="text-[#4ade80] font-bold">-{formatPKR(discount)}</span></div>}
             </div>
 
-            <div className="checkout__summary-total">
+            <div className="flex items-center justify-between pt-4 border-t border-border-dark text-[13px] text-light-300 font-bold uppercase tracking-[1px]">
               <span>Total</span>
-              <strong>{formatPKR(total)}</strong>
+              <strong className="font-body font-bold text-[1.65rem] text-gold tracking-[0.2px]">{formatPKR(total)}</strong>
             </div>
 
-            <div className="checkout__promo">
+            <div className="flex gap-2">
               <input
                 type="text" placeholder="Promo code" value={promoCode}
                 onChange={e => { setPromoCode(e.target.value); setPromoError(''); }}
+                className="flex-1 bg-bg-600 border border-border-dark text-light-100 py-[9px] px-3 rounded-sm text-[12.5px] outline-none focus:border-gold"
               />
-              <button onClick={applyPromo} className="btn btn-outline">Apply</button>
+              <button onClick={applyPromo} className="btn btn-outline py-[9px] px-[18px] text-[11px]">Apply</button>
             </div>
-            {promoError && <p className="checkout__promo-error">{promoError}</p>}
-            {promoApplied && <p className="checkout__promo-success"><IconCheck /> Code applied — {Math.round(promoApplied * 100)}% off</p>}
+            {promoError && <p className="text-[11px] text-red-light mt-[-8px]">{promoError}</p>}
+            {promoApplied && <p className="text-[11px] text-[#4ade80] mt-[-8px] flex items-center gap-[5px] [&>svg]:w-3 [&>svg]:h-3"><IconCheck /> Code applied — {Math.round(promoApplied * 100)}% off</p>}
 
-            <ul className="checkout__guarantees">
-              <li><IconShield /> Quality guarantee on all kits</li>
-              <li><IconCheck /> Free revision on printing errors</li>
-              <li><IconTruck /> Tracked delivery, door to door</li>
-              <li><IconLock /> Secure encrypted payments</li>
+            <ul className="flex flex-col gap-2 pt-3 border-t border-border-dark">
+              <li className="flex items-center gap-2 text-[11.5px] text-light-500 [&>svg]:w-[14px] [&>svg]:h-[14px] [&>svg]:text-gold [&>svg]:flex-shrink-0"><IconShield /> Quality guarantee on all kits</li>
+              <li className="flex items-center gap-2 text-[11.5px] text-light-500 [&>svg]:w-[14px] [&>svg]:h-[14px] [&>svg]:text-gold [&>svg]:flex-shrink-0"><IconCheck /> Free revision on printing errors</li>
+              <li className="flex items-center gap-2 text-[11.5px] text-light-500 [&>svg]:w-[14px] [&>svg]:h-[14px] [&>svg]:text-gold [&>svg]:flex-shrink-0"><IconTruck /> Tracked delivery, door to door</li>
+              <li className="flex items-center gap-2 text-[11.5px] text-light-500 [&>svg]:w-[14px] [&>svg]:h-[14px] [&>svg]:text-gold [&>svg]:flex-shrink-0"><IconLock /> Secure encrypted payments</li>
             </ul>
 
-            <button onClick={handlePlaceOrder} className="btn btn-darkred checkout__place-order">
+            <button onClick={handlePlaceOrder} className="btn btn-darkred w-full p-[15px] text-[13px]">
               Place Order
             </button>
-            <p className="checkout__terms">
-              By placing your order you agree to our <Link to="/contact">Terms of Service &amp; Return Policy</Link>
+            <p className="text-[10.5px] text-light-700 text-center leading-[1.6]">
+              By placing your order you agree to our <Link to="/contact" className="text-light-500 underline">Terms of Service &amp; Return Policy</Link>
             </p>
           </div>
         </aside>
       </div>
 
       {placed && (
-        <div className="checkout__toast">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-gold text-bg-800 font-bold text-[13px] py-[14px] px-[26px] rounded-full shadow-[0_4px_24px_rgba(245,166,35,0.4)] z-[100] animate-[checkoutToastPop_220ms_ease] [&>svg]:w-4 [&>svg]:h-4">
           <IconCheck /> Order placed! Confirmation sent to {contact.email || 'your email'}.
         </div>
       )}
@@ -343,17 +353,20 @@ export default function Checkout() {
 /* ── Stepper ────────────────────────────────────────────────── */
 function Stepper() {
   return (
-    <div className="checkout__stepper-bar">
-      {STEPS.map((s, i) => (
-        <div key={s.id} className={`checkout__step${i < 2 ? ' checkout__step--done' : ''}`}>
-          <span className="checkout__step-circle">{i < 1 ? <IconCheck /> : s.id}</span>
-          <span className="checkout__step-text">
-            <strong>{s.label}</strong>
-            <em>{s.status}</em>
-          </span>
-          {i < STEPS.length - 1 && <span className="checkout__step-line" />}
-        </div>
-      ))}
+    <div className="flex items-start justify-center py-8 px-6 max-w-[640px] mx-auto max-[980px]:max-w-full">
+      {STEPS.map((s, i) => {
+        const done = i < 2;
+        return (
+          <div key={s.id} className="flex items-center flex-1">
+            <span className={`flex items-center justify-center w-[34px] h-[34px] rounded-full font-bold text-[13px] flex-shrink-0 ${done ? 'bg-red border-2 border-red text-light-100' : 'bg-bg-600 border-2 border-border-medium text-light-500'}`}>{i < 1 ? <IconCheck /> : s.id}</span>
+            <span className="flex flex-col ml-3 whitespace-nowrap">
+              <strong className="text-[12px] font-bold text-light-200 uppercase tracking-[0.5px] max-[640px]:text-[10px]">{s.label}</strong>
+              <em className={`not-italic text-[10.5px] max-[640px]:hidden ${done ? 'text-gold' : 'text-light-600'}`}>{s.status}</em>
+            </span>
+            {i < STEPS.length - 1 && <span className={`flex-1 h-0.5 mx-3 self-center ${done ? 'bg-red' : 'bg-border-medium'}`} />}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -361,8 +374,11 @@ function Stepper() {
 /* ── Small building blocks ─────────────────────────────────── */
 function Card({ step, title, children }) {
   return (
-    <section className="checkout__card">
-      <h2 className="checkout__card-title"><span>{step}</span>{title}</h2>
+    <section className="bg-bg-700 border border-border-dark rounded-lg p-6 flex flex-col gap-4">
+      <h2 className="flex items-center gap-3 font-body font-bold text-[1.2rem] tracking-[0.4px] text-light-100">
+        <span className="flex items-center justify-center w-[26px] h-[26px] rounded-full bg-gold text-bg-800 font-body text-[12px] font-extrabold flex-shrink-0">{step}</span>
+        {title}
+      </h2>
       {children}
     </section>
   );
@@ -370,21 +386,21 @@ function Card({ step, title, children }) {
 
 function FactRow({ label, value }) {
   return (
-    <div className="checkout__fact-row">
-      <span>{label}</span>
-      <span>{value}</span>
+    <div className="flex items-center justify-between text-[13px]">
+      <span className="text-light-600 font-semibold">{label}</span>
+      <span className="text-light-100 font-bold">{value}</span>
     </div>
   );
 }
 
 function TextField({ label, required, type = 'text', placeholder, value, onChange, error, maxLength }) {
   return (
-    <div className={`checkout__field${error ? ' checkout__field--error' : ''}`}>
-      <label>{label}{required && ' *'}</label>
+    <div className="flex flex-col gap-[6px]" data-field-error={error ? 'true' : undefined}>
+      <label className={error ? 'text-[11px] font-bold tracking-[0.8px] uppercase text-red-light' : fieldLabelCls}>{label}{required && ' *'}</label>
       <input
         type={type} placeholder={placeholder} value={value} maxLength={maxLength}
         onChange={e => onChange(e.target.value)}
-        className="checkout__input"
+        className={error ? `${inputCls} border-red-light` : inputCls}
       />
     </div>
   );

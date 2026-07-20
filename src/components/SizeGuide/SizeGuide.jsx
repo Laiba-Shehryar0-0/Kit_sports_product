@@ -1,5 +1,3 @@
-import './SizeGuide.css';
-
 const SIZES = [
   { size: 'Small',  chest: '34–36', waist: '28–30', length: '26–28' },
   { size: 'Medium', chest: '38–40', waist: '32–34', length: '28–30' },
@@ -30,46 +28,50 @@ const STEPS = [
 
 export default function SizeGuide() {
   return (
-    <section className="size-guide">
-      <div className="size-guide__left">
-        <div className="size-guide__left-inner">
+    <section className="grid grid-cols-2 min-h-[580px]">
+      <div className="bg-bg-900 flex items-center">
+        <div className="py-16 px-12 max-w-[600px] m-auto w-full flex flex-col items-start justify-center gap-10 max-[900px]:py-12 max-[900px]:px-6 max-[900px]:max-w-full max-[900px]:m-0">
           <h2 className="section-title">Size Guide</h2>
 
-          <div className="size-guide__table-wrap">
-            <table className="size-guide__table">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-[0.875rem]">
               <thead>
                 <tr>
-                  <th>Size</th>
-                  <th>Chest (in)</th>
-                  <th>Waist (in)</th>
-                  <th>Length (in)</th>
+                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Size</th>
+                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Chest (in)</th>
+                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Waist (in)</th>
+                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Length (in)</th>
                 </tr>
               </thead>
               <tbody>
-                {SIZES.map(({ size, chest, waist, length }) => (
-                  <tr key={size}>
-                    <td>{size}</td>
-                    <td>{chest}</td>
-                    <td>{waist}</td>
-                    <td>{length}</td>
-                  </tr>
-                ))}
+                {SIZES.map(({ size, chest, waist, length }, i) => {
+                  const isLast = i === SIZES.length - 1;
+                  const tdCls = `py-3 px-4 text-light-300 group-hover:bg-bg-600${isLast ? '' : ' border-b border-border-dark'}`;
+                  return (
+                    <tr key={size} className="group">
+                      <td className={tdCls}>{size}</td>
+                      <td className={tdCls}>{chest}</td>
+                      <td className={tdCls}>{waist}</td>
+                      <td className={tdCls}>{length}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <div className="size-guide__right">
-        <div className="size-guide__right-inner">
-          <h2 className="section-title size-guide__measure-title">How to Measure</h2>
-          <div className="size-guide__steps">
+      <div className="bg-light-100 flex items-center">
+        <div className="py-16 px-12 max-w-[600px] m-auto w-full flex flex-col items-start justify-center gap-12 max-[900px]:py-12 max-[900px]:px-6 max-[900px]:max-w-full">
+          <h2 className="section-title text-black">How to Measure</h2>
+          <div className="flex flex-col gap-8">
             {STEPS.map(({ num, label, icon, desc }) => (
-              <div key={num} className="size-guide__step">
-                <div className="size-guide__step-num">{num}</div>
-                <div className="size-guide__step-content">
-                  <strong>{label}</strong>
-                  <p>{desc}</p>
+              <div key={num} className="flex items-start gap-5">
+                <div className="w-12 h-12 bg-red text-light-100 font-display text-[1.5rem] flex items-center justify-center flex-shrink-0 rounded-full">{num}</div>
+                <div>
+                  <strong className="block text-[16px] font-bold text-bg-800 mb-1">{label}</strong>
+                  <p className="text-[0.95rem] text-light-700 leading-[1.6]">{desc}</p>
                 </div>
               </div>
             ))}

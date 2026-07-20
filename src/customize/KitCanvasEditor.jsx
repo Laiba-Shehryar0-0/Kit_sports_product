@@ -8,8 +8,16 @@ import {
   IconEye, IconEyeOff, IconTrash, IconChevronLeft, IconBucket, IconEraser, IconShapes,
 } from './icons';
 import ColorPicker from './ColorPicker';
-import '../pages/Customize.css';
-import '../pages/DrawStudio.css';
+import {
+  customizerCls, topbarCls, topbarLeftCls, topbarRightCls, iconBtnCls, exportBtnCls,
+  bodyCls, railCls, canvasCls, canvasCardCls, sidebarCls, tabsCls, tabCls, panelCls, panelBoxCls, sectionCls,
+  labelCls, paletteCls, swatchCls, sliderRowCls, sliderCls, sliderValueCls,
+  fontGridCls, fontBtnCls, fontBtnSpanCls, hintCls,
+  drawHiddenPreviewCls, drawBackLinkCls, drawTitleCls, drawToastCls,
+  drawLoadingCls, drawLayerListCls, drawLayerRowCls, drawLayerRowSpanCls,
+  drawLayerRowActionsCls, drawLayerRowBtnCls, drawShapeGridCls, drawShapeBtnCls,
+  drawShapeIconCls, drawShapeBtnSpanCls,
+} from './customizerClasses';
 
 // Matches the on-screen size of the kit preview on the main Customize page (its
 // .customizer__preview-kit box: max 300x360, 5:6 aspect) — Fabric renders its canvas at this
@@ -91,14 +99,14 @@ function createShapeObject(def, color) {
 function ShapeIcon({ def }) {
   if (def.kind === 'ellipse') {
     return (
-      <svg viewBox={`0 0 ${def.rx * 2} ${def.ry * 2}`} className="draw__shape-icon">
+      <svg viewBox={`0 0 ${def.rx * 2} ${def.ry * 2}`} className={drawShapeIconCls}>
         <ellipse cx={def.rx} cy={def.ry} rx={def.rx} ry={def.ry} fill="currentColor" />
       </svg>
     );
   }
   if (def.kind === 'path') {
     return (
-      <svg viewBox="0 0 100 100" className="draw__shape-icon">
+      <svg viewBox="0 0 100 100" className={drawShapeIconCls}>
         <path d={def.d} fill="currentColor" />
       </svg>
     );
@@ -106,7 +114,7 @@ function ShapeIcon({ def }) {
   const maxX = Math.max(...def.points.map(p => p.x));
   const maxY = Math.max(...def.points.map(p => p.y));
   return (
-    <svg viewBox={`0 0 ${maxX} ${maxY}`} className="draw__shape-icon">
+    <svg viewBox={`0 0 ${maxX} ${maxY}`} className={drawShapeIconCls}>
       <polygon points={def.points.map(p => `${p.x},${p.y}`).join(' ')} fill="currentColor" />
     </svg>
   );
@@ -625,100 +633,104 @@ export default function KitCanvasEditor({ mode, initialSide = 'front' }) {
     return () => window.removeEventListener('resize', updatePosition);
   }, [ready]);
 
+  const brushSizeShown = activeTool === 'draw' || activeTool === 'erase';
+  const selectedObjShown = !!selectedObj;
+  const fontStyleShown = !!(selectedObj && selectedObj.type === 'textbox');
+
   return (
-    <div className="customizer draw">
+    <div className={customizerCls}>
       {/* Off-screen: renders the user's real, current kit so we can snapshot it as the drawing surface */}
-      <div ref={hiddenPreviewRef} className="draw__hidden-preview" aria-hidden="true">
+      <div ref={hiddenPreviewRef} className={drawHiddenPreviewCls} aria-hidden="true">
         <KitPreview {...design} side={initialSide} />
       </div>
 
-      <div className="customizer__topbar">
-        <div className="customizer__topbar-left">
+      <div className={topbarCls}>
+        <div className={topbarLeftCls}>
           <button
             onClick={goBackToStudio}
-            className="draw__back-link"
+            className={drawBackLinkCls}
             style={backLinkLeft !== null ? { position: 'fixed', left: backLinkLeft, top: 72, height: 60 } : undefined}
           >
             <IconChevronLeft /> Back
           </button>
           {mode === 'kit' && (
-            <span className="draw__title">Editing {initialSide === 'back' ? 'Back' : 'Front'}</span>
+            <span className={drawTitleCls}>Editing {initialSide === 'back' ? 'Back' : 'Front'}</span>
           )}
         </div>
-        <div className="customizer__topbar-right">
-          <button className="customizer__iconbtn" onClick={handleUndo} disabled={!canUndo} title="Undo"><IconUndo /></button>
-          <button className="customizer__iconbtn" onClick={handleRedo} disabled={!canRedo} title="Redo"><IconRedo /></button>
-          <button onClick={exportPNG} className="btn btn-grey customizer__export-btn">
+        <div className={topbarRightCls}>
+          <button className={iconBtnCls(false)} onClick={handleUndo} disabled={!canUndo} title="Undo"><IconUndo /></button>
+          <button className={iconBtnCls(false)} onClick={handleRedo} disabled={!canRedo} title="Redo"><IconRedo /></button>
+          <button onClick={exportPNG} className={`btn btn-grey ${exportBtnCls}`}>
             <IconExport /> Export PNG
           </button>
           {mode === 'logo' && (
-            <button onClick={useAsLogo} className="btn btn-darkred customizer__export-btn">
+            <button onClick={useAsLogo} className={`btn btn-darkred ${exportBtnCls}`}>
               Use as Logo
             </button>
           )}
         </div>
       </div>
 
-      <div className="customizer__body">
-        <div className="customizer__rail">
+      <div className={bodyCls(false)}>
+        <div className={railCls}>
           <button
-            className={`customizer__iconbtn${activeTool === 'select' ? ' customizer__iconbtn--active' : ''}`}
+            className={iconBtnCls(activeTool === 'select')}
             onClick={() => setActiveTool('select')}
             title="Select"
           ><IconSelect /></button>
           <button
-            className={`customizer__iconbtn${activeTool === 'draw' ? ' customizer__iconbtn--active' : ''}`}
+            className={iconBtnCls(activeTool === 'draw')}
             onClick={() => setActiveTool('draw')}
             title="Draw"
           ><IconDraw /></button>
           <button
-            className={`customizer__iconbtn${activeTool === 'fill' ? ' customizer__iconbtn--active' : ''}`}
+            className={iconBtnCls(activeTool === 'fill')}
             onClick={() => setActiveTool('fill')}
             title="Fill"
           ><IconBucket /></button>
           <button
-            className={`customizer__iconbtn${activeTool === 'erase' ? ' customizer__iconbtn--active' : ''}`}
+            className={iconBtnCls(activeTool === 'erase')}
             onClick={() => setActiveTool('erase')}
             title="Erase"
           ><IconEraser /></button>
-          <button className="customizer__iconbtn" onClick={addText} title="Text"><IconText /></button>
-          <button className="customizer__iconbtn" onClick={clearCanvas} title="Clear"><IconTrash /></button>
+          <button className={iconBtnCls(false)} onClick={addText} title="Text"><IconText /></button>
+          <button className={iconBtnCls(false)} onClick={clearCanvas} title="Clear"><IconTrash /></button>
         </div>
 
-        <main className="customizer__canvas">
-          <div ref={canvasCardRef} className="draw__canvas-card">
-            {!ready && <div className="draw__loading">Loading your kit…</div>}
+        <main className={canvasCls}>
+          <div ref={canvasCardRef} className={canvasCardCls}>
+            {!ready && <div className={drawLoadingCls}>Loading your kit…</div>}
             <canvas ref={canvasElRef} />
-            {toast && <div className="draw__toast">{toast}</div>}
+            {toast && <div className={drawToastCls}>{toast}</div>}
           </div>
         </main>
 
-        <aside className="customizer__sidebar">
-          <div className="customizer__tabs">
+        <aside className={sidebarCls}>
+          <div className={tabsCls}>
             {TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`customizer__tab${activeTab === tab.id ? ' customizer__tab--active' : ''}`}
+                className={tabCls(activeTab === tab.id)}
               >
-                <span>{tab.icon}</span>
+                <span className="flex">{tab.icon}</span>
                 <span>{tab.label}</span>
               </button>
             ))}
           </div>
 
-          <div className="customizer__panel">
+          <div className={panelCls}>
             {activeTab === 'colors' && (
-              <div className="panel">
-                <div className="panel__section">
-                  <h3 className="panel__label">{activeTool === 'fill' ? 'Fill Color' : 'Brush Color'}</h3>
-                  <div className="panel__palette">
+              <div className={panelBoxCls}>
+                <div className={sectionCls({ first: true, last: !brushSizeShown && !selectedObjShown })}>
+                  <h3 className={labelCls}>{activeTool === 'fill' ? 'Fill Color' : 'Brush Color'}</h3>
+                  <div className={paletteCls}>
                     {COLOR_PALETTE.map(c => (
                       <button
                         key={c.hex}
                         onClick={() => setBrushColor(c.hex)}
-                        className={`panel__swatch${brushColor === c.hex ? ' panel__swatch--active' : ''}`}
-                        style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid var(--swatch-outline)' : 'none' }}
+                        className={swatchCls(brushColor === c.hex)}
+                        style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid var(--color-swatch-outline)' : 'none' }}
                         title={c.name}
                         aria-label={c.name}
                       />
@@ -727,30 +739,30 @@ export default function KitCanvasEditor({ mode, initialSide = 'front' }) {
                   <ColorPicker value={brushColor} onChange={setBrushColor} />
                 </div>
 
-                {(activeTool === 'draw' || activeTool === 'erase') && (
-                  <div className="panel__section">
-                    <h3 className="panel__label">{activeTool === 'erase' ? 'Eraser Size' : 'Brush Size'}</h3>
-                    <div className="panel__slider-row">
+                {brushSizeShown && (
+                  <div className={sectionCls({ last: !selectedObjShown })}>
+                    <h3 className={labelCls}>{activeTool === 'erase' ? 'Eraser Size' : 'Brush Size'}</h3>
+                    <div className={sliderRowCls}>
                       <input
                         type="range" min="1" max="40" value={brushSize}
                         onChange={e => setBrushSize(Number(e.target.value))}
-                        className="panel__slider"
+                        className={sliderCls}
                       />
-                      <span className="panel__slider-value">{brushSize}px</span>
+                      <span className={sliderValueCls}>{brushSize}px</span>
                     </div>
                   </div>
                 )}
 
-                {selectedObj && (
-                  <div className="panel__section">
-                    <h3 className="panel__label">Selected Object Color</h3>
-                    <div className="panel__palette">
+                {selectedObjShown && (
+                  <div className={sectionCls({ last: true })}>
+                    <h3 className={labelCls}>Selected Object Color</h3>
+                    <div className={paletteCls}>
                       {COLOR_PALETTE.map(c => (
                         <button
                           key={c.hex}
                           onClick={() => applyToSelection(c.hex)}
-                          className="panel__swatch"
-                          style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid var(--swatch-outline)' : 'none' }}
+                          className={swatchCls(false)}
+                          style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid var(--color-swatch-outline)' : 'none' }}
                           title={c.name}
                           aria-label={c.name}
                         />
@@ -763,22 +775,22 @@ export default function KitCanvasEditor({ mode, initialSide = 'front' }) {
             )}
 
             {activeTab === 'text' && (
-              <div className="panel">
-                <div className="panel__section">
+              <div className={panelBoxCls}>
+                <div className={sectionCls({ first: true, last: !fontStyleShown })}>
                   <button className="btn btn-grey" onClick={addText}>+ Add Text</button>
                 </div>
-                {selectedObj && selectedObj.type === 'textbox' && (
-                  <div className="panel__section">
-                    <h3 className="panel__label">Font Style</h3>
-                    <div className="panel__font-grid">
+                {fontStyleShown && (
+                  <div className={sectionCls({ last: true })}>
+                    <h3 className={labelCls}>Font Style</h3>
+                    <div className={fontGridCls}>
                       {FONTS.slice(0, 4).map(f => (
                         <button
                           key={f.id}
                           onClick={() => { selectedObj.set({ fontFamily: f.id }); fabricRef.current.requestRenderAll(); pushHistorySnapshot(); }}
-                          className={`panel__font-btn${selectedObj.fontFamily === f.id ? ' panel__font-btn--active' : ''}`}
+                          className={fontBtnCls(selectedObj.fontFamily === f.id)}
                           style={{ fontFamily: f.id }}
                         >
-                          Aa <span>{f.label}</span>
+                          Aa <span className={fontBtnSpanCls}>{f.label}</span>
                         </button>
                       ))}
                     </div>
@@ -788,14 +800,14 @@ export default function KitCanvasEditor({ mode, initialSide = 'front' }) {
             )}
 
             {activeTab === 'shapes' && (
-              <div className="panel">
-                <div className="panel__section">
-                  <h3 className="panel__label">Shapes</h3>
-                  <div className="draw__shape-grid">
+              <div className={panelBoxCls}>
+                <div className={sectionCls({ first: true, last: true })}>
+                  <h3 className={labelCls}>Shapes</h3>
+                  <div className={drawShapeGridCls}>
                     {SHAPES.map(def => (
-                      <button key={def.id} className="draw__shape-btn" onClick={() => addShape(def.id)} title={def.label}>
+                      <button key={def.id} className={drawShapeBtnCls} onClick={() => addShape(def.id)} title={def.label}>
                         <ShapeIcon def={def} />
-                        <span>{def.label}</span>
+                        <span className={drawShapeBtnSpanCls}>{def.label}</span>
                       </button>
                     ))}
                   </div>
@@ -804,24 +816,24 @@ export default function KitCanvasEditor({ mode, initialSide = 'front' }) {
             )}
 
             {activeTab === 'layers' && (
-              <div className="panel">
-                <div className="panel__section">
-                  <h3 className="panel__label">Layers</h3>
-                  <p className="panel__hint">Text and pen strokes appear here. Fills paint directly onto the kit surface, so they don't show as separate layers.</p>
-                  {layers.length === 0 && <p className="panel__hint">Nothing added yet.</p>}
-                  <div className="draw__layer-list">
+              <div className={panelBoxCls}>
+                <div className={sectionCls({ first: true, last: true })}>
+                  <h3 className={labelCls}>Layers</h3>
+                  <p className={hintCls}>Text and pen strokes appear here. Fills paint directly onto the kit surface, so they don't show as separate layers.</p>
+                  {layers.length === 0 && <p className={hintCls}>Nothing added yet.</p>}
+                  <div className={drawLayerListCls}>
                     {layers.slice().reverse().map((obj, i) => (
                       <div
                         key={i}
-                        className={`draw__layer-row${selectedObj === obj ? ' draw__layer-row--active' : ''}`}
+                        className={drawLayerRowCls(selectedObj === obj)}
                         onClick={() => selectLayer(obj)}
                       >
-                        <span>{obj.type === 'textbox' ? `“${obj.text}”` : obj.type === 'path' ? 'Pen stroke' : obj.type}</span>
-                        <span className="draw__layer-row-actions">
-                          <button onClick={(e) => { e.stopPropagation(); toggleVisible(obj); }} title="Toggle visibility">
+                        <span className={drawLayerRowSpanCls}>{obj.type === 'textbox' ? `“${obj.text}”` : obj.type === 'path' ? 'Pen stroke' : obj.type}</span>
+                        <span className={drawLayerRowActionsCls}>
+                          <button className={drawLayerRowBtnCls} onClick={(e) => { e.stopPropagation(); toggleVisible(obj); }} title="Toggle visibility">
                             {obj.visible === false ? <IconEyeOff /> : <IconEye />}
                           </button>
-                          <button onClick={(e) => { e.stopPropagation(); deleteObject(obj); }} title="Delete this layer">
+                          <button className={drawLayerRowBtnCls} onClick={(e) => { e.stopPropagation(); deleteObject(obj); }} title="Delete this layer">
                             <IconTrash />
                           </button>
                         </span>

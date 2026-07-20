@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import cricketShirtImg    from '../../assets/cricket-shirt.png';
+import cricketShirtImg    from '../../assets/cricket-shirt-front.png';
 import cricketTrousersImg from '../../assets/cricket-trousers-front.png';
-import cricketSweaterImg  from '../../assets/cricket-sweater.png';
-import footballJerseyImg  from '../../assets/football-jersey.png';
+import cricketSweaterImg  from '../../assets/cricket-sweater-front.png';
+import footballJerseyImg  from '../../assets/football-jersey-front.png';
 import footballShortsImg  from '../../assets/football-shorts-front.png';
 import goalkeeperKitImg   from '../../assets/goalkeeperkit-front.png';
 import basketballJerseyImg from '../../assets/basketball-jersey-front.png';
 import basketballShortsImg from '../../assets/basketball-shorts-front.png';
-import trainingTShirtImg  from '../../assets/training-T-shit.png';
-import trackJacketImg     from '../../assets/Track-jacket.png';
+import trainingTShirtImg  from '../../assets/training-T-shit-front.png';
+import trackJacketImg     from '../../assets/tracksuit-front.png';
 import trainingShortsImg  from '../../assets/training-shorts-front.png';
 import trainingVestImg    from '../../assets/training-vest-front.png';
-import './ProductGallery.css';
 
 const PRODUCTS = [
   { id: 1,  image: cricketShirtImg,     name: 'Cricket Shirt',      cat: 'cricket',    color: '#1a3a1a' },
@@ -39,9 +38,9 @@ export default function ProductGallery() {
     : PRODUCTS.filter(p => p.cat === active);
 
   return (
-    <section className="gallery">
+    <section className="bg-bg-800 py-24">
       <div className="container">
-        <div className="gallery__header">
+        <div className="flex flex-col items-start text-left gap-4 mb-10">
           <span className="section-label">Full Collection</span>
           <h2 className="section-title">Complete Product Gallery</h2>
           <p className="section-subtitle">
@@ -49,37 +48,45 @@ export default function ProductGallery() {
           </p>
         </div>
 
-        <div className="gallery__filters">
-          {FILTERS.map(f => (
-            <button
-              key={f}
-              onClick={() => setActive(f)}
-              className={`gallery__filter${active === f ? ' gallery__filter--active' : ''}`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+        <div className="flex items-center justify-center gap-2 flex-wrap mb-10">
+          {FILTERS.map(f => {
+            const isActive = active === f;
+            return (
+              <button
+                key={f}
+                onClick={() => setActive(f)}
+                className={`py-2 px-5 text-[11px] font-bold tracking-[1.5px] uppercase border-[1.5px] cursor-pointer rounded-[6px] transition-[all_200ms_ease] active:translate-y-0 hover:bg-bg-400 hover:text-light-100 hover:border-border-medium hover:-translate-y-px hover:shadow-[0_3px_8px_rgba(0,0,0,0.25)] ${isActive ? 'bg-red text-light-100 border-red shadow-[0_4px_12px_rgba(204,0,0,0.35)]' : 'bg-bg-600 text-light-500 border-border-dark'}`}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="gallery__grid">
+        <div className="flex flex-wrap justify-center gap-6 max-w-[900px] mx-auto">
           {visible.map((product) => (
-            <Link key={product.id} to="/customize" className="gallery__card" style={{ '--card-bg': product.color }}>
-              <div className="gallery__card-img">
-                <img src={product.image} alt={product.name} className="gallery__card-png" />
+            <Link
+              key={product.id}
+              to="/customize"
+              className="group relative w-[130px] h-[130px] flex-shrink-0 bg-[var(--card-bg,var(--color-bg-600))] border border-border-dark aspect-[1] flex flex-col items-center justify-center overflow-hidden rounded-full no-underline transition-[transform_250ms_ease,box-shadow_250ms_ease] hover:scale-[1.08] hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)] hover:z-[1] hover:bg-[#4a4a4a]!"
+              style={{ '--card-bg': product.color }}
+            >
+              <div className="w-[60px] h-[60px] flex items-center justify-center bg-transparent rounded-none">
+                <img src={product.image} alt={product.name} className="w-20 h-20 object-contain invert mix-blend-screen" />
               </div>
-              <div className="gallery__card-label">{product.name}</div>
-              <div className="gallery__card-hover">
-                <span>Customize →</span>
+              <div className="absolute bottom-0 left-0 right-0 bg-[rgba(0,0,0,0.8)] text-light-300 text-[9px] font-bold tracking-[0.5px] text-center py-1 px-2 uppercase translate-y-full transition-[transform_150ms_ease] group-hover:translate-y-0">{product.name}</div>
+              <div className="absolute inset-0 bg-[rgba(70,70,70,0.88)] flex items-center justify-center opacity-0 transition-[opacity_250ms_ease] group-hover:opacity-100">
+                <span className="text-[11px] font-bold tracking-[1px] uppercase text-light-100">Customize →</span>
               </div>
             </Link>
           ))}
         </div>
 
-        <div className="gallery__meta">
+        <div className="flex items-center justify-center gap-4 mt-8 text-[12px] font-semibold tracking-[1px] uppercase text-light-600">
           <span>16 Unique Products</span>
-          <span className="gallery__meta-dot">•</span>
+          <span className="text-gold">•</span>
           <span>32 Total Images</span>
-          <span className="gallery__meta-dot">•</span>
+          <span className="text-gold">•</span>
           <span>4 Sports Categories</span>
         </div>
       </div>

@@ -14,12 +14,31 @@ import {
   IconKit, IconPalette, IconTag, IconChevronLeft,
 } from '../customize/icons';
 import ColorPicker from '../customize/ColorPicker';
-import cricketShirtImg from '../assets/cricket-shirt.png';
+import {
+  customizerCls, topbarCls, topbarLeftCls, topbarRightCls, topbarCenterCls,
+  iconBtnCls, exportBtnCls, sideToggleCls, sideBtnCls, bodyCls, railCls,
+  canvasCls, canvasCardCls, previewWrapCls, previewKitCls, previewKitImgCls,
+  zoomCls, zoomBtnCls, zoomSpanCls, infoBarCls, colorSwatchCls, toastCls,
+  sidebarCls, tabsCls, tabCls, panelCls, panelBoxCls, sectionCls, labelCls,
+  kitGridCls, kitBtnCls, kitThumbCls, sportGridCls, sportBtnCls, sportBackCls,
+  pillRowCls, pillCls, sizeGridCls, sizeBtnCls, templateGridCls, templateBtnCls,
+  templateThumbCls, moreBtnCls, customSizeRowCls, customSizeInputCls,
+  unitDropdownCls, unitDropdownBtnCls, unitDropdownListCls, unitDropdownItemCls,
+  segmentedCls, segmentCls, hintCls, colorPreviewCls, colorPreviewSwatchCls,
+  colorPreviewTitleCls, colorPreviewHexCls, paletteCls, swatchCls, sliderRowCls,
+  sliderRowLabeledCls, sliderLabelCls, sliderCls, sliderValueCls, fontGridCls,
+  fontBtnCls, fontBtnSpanCls, posRowCls, posColCls, posColLabelCls, posGridCls,
+  posBtnCls, drawStudioLinkCls, dropzoneCls, dropzonePreviewCls, linkBtnCls,
+  badgeBtnCls, badgeThumbCls, layerListCls, layerRowCls, layerGripCls,
+  layerNameCls, layerEyeCls, stateBoxCls, stateRowCls, stateRowLabelCls,
+  stateValueCls, stateSwatchCls, inputCls,
+} from '../customize/customizerClasses';
+import cricketShirtImg from '../assets/cricket-shirt-front.png';
 import cricketTrousersImg from '../assets/cricket-trousers-front.png';
 import cricketTrousersBackImg from '../assets/cricket-trousers-back.png';
-import cricketSweaterImg from '../assets/cricket-sweater.png';
+import cricketSweaterImg from '../assets/cricket-sweater-front.png';
 import cricketCapImg from '../assets/cricket-cap.png';
-import footballJerseyImg from '../assets/football-jersey.png';
+import footballJerseyImg from '../assets/football-jersey-front.png';
 import footballShortsImg from '../assets/football-shorts-front.png';
 import footballShortsBackImg from '../assets/football-shorts-back.png';
 import goalkeeperKitImg from '../assets/goalkeeperkit-front.png';
@@ -28,8 +47,8 @@ import basketballJerseyImg from '../assets/basketball-jersey-front.png';
 import basketballJerseyBackImg from '../assets/basketball-jersey-back.png';
 import basketballShortsImg from '../assets/basketball-shorts-front.png';
 import basketballShortsBackImg from '../assets/basketball-shorts-back.png';
-import basketballShoesImg from '../assets/basketball-shoes.png';
-import trainingTShirtImg from '../assets/training-T-shit.png';
+import basketballHeadbandImg from '../assets/basketball-headband.png';
+import trainingTShirtImg from '../assets/training-T-shit-front.png';
 import trainingShortsImg from '../assets/training-shorts-front.png';
 import trainingShortsBackImg from '../assets/training-shorts-back.png';
 import trainingVestImg from '../assets/training-vest-front.png';
@@ -37,16 +56,14 @@ import trainingVestBackImg from '../assets/training-vest-back.png';
 import tracksuitImg from '../assets/tracksuit-front.png';
 import tracksuitBackImg from '../assets/tracksuit-back.png';
 import warmupSuitImg from '../assets/warmup-suit-front.png';
-import warmupSuitBackImg from '../assets/warmup-suit-back.png';
 import trainingBibImg from '../assets/training-bib-front.png';
 import trainingBibBackImg from '../assets/training-bib-back.png';
 import boxingKitImg from '../assets/boxing-kit.png';
-import hockeyKitImg from '../assets/hockey-kit.png';
+import hockeyKitImg from '../assets/hockey-kit-front.png';
 import cyclingKitImg from '../assets/cycling-kit-front.png';
 import cyclingKitBackImg from '../assets/cycling-kit-back.png';
 import rugbyKitImg from '../assets/rugby-kit-front.png';
 import rugbyKitBackImg from '../assets/rugby-kit-back.png';
-import './Customize.css';
 
 /** Sport → specific product catalog, each mapped to a KIT_TYPES id so the SVG preview knows what to render */
 const SPORT_KIT_GROUPS = [
@@ -73,8 +90,8 @@ const SPORT_KIT_GROUPS = [
     items: [
       { id: 'basketball-jersey', label: 'Basketball Jersey', image: basketballJerseyImg, imageBack: basketballJerseyBackImg, kitType: 'jersey' },
       { id: 'basketball-shorts', label: 'Basketball Shorts', image: basketballShortsImg, imageBack: basketballShortsBackImg, kitType: 'shorts' },
-      { id: 'basketball-shoes',  label: 'Basketball Shoes',  image: basketballShoesImg,  kitType: 'socks' },
-      { id: 'warmup-suit',       label: 'Warm-up Suit',      image: warmupSuitImg,       imageBack: warmupSuitBackImg,       kitType: 'jumper' },
+      { id: 'basketball-headband', label: 'Basketball Headband', image: basketballHeadbandImg, kitType: 'cap' },
+      { id: 'warmup-suit',       label: 'Warm-up Suit',      image: warmupSuitImg,       kitType: 'jumper' },
     ],
   },
   {
@@ -270,39 +287,39 @@ export default function Customize() {
   const kitLabel = design.kitProduct || KIT_TYPES.find(k => k.id === design.kitType)?.label || 'Jersey';
 
   return (
-    <div className="customizer">
+    <div className={customizerCls}>
       {/* ── Top toolbar ─────────────────────────────────────── */}
-      <div className="customizer__topbar">
-        <div className="customizer__topbar-left">
+      <div className={topbarCls}>
+        <div className={topbarLeftCls}>
           <ToolBtn onClick={() => setRailHidden(v => !v)} title={railHidden ? 'Show tools' : 'Hide tools'}>
             <IconChevronLeft style={{ transform: railHidden ? 'rotate(180deg)' : 'none' }} />
           </ToolBtn>
         </div>
 
-        <div className="customizer__topbar-center">
-          <div className="customizer__side-toggle">
-            <button onClick={() => setSide('front')} className={`customizer__side-btn${side === 'front' ? ' customizer__side-btn--active' : ''}`}>Front</button>
-            <button onClick={() => setSide('back')} className={`customizer__side-btn${side === 'back' ? ' customizer__side-btn--active' : ''}`}>Back</button>
+        <div className={topbarCenterCls}>
+          <div className={sideToggleCls}>
+            <button onClick={() => setSide('front')} className={sideBtnCls(side === 'front')}>Front</button>
+            <button onClick={() => setSide('back')} className={sideBtnCls(side === 'back')}>Back</button>
           </div>
         </div>
 
-        <div className="customizer__topbar-right">
+        <div className={topbarRightCls}>
           <ToolBtn onClick={undo} disabled={!canUndo} title="Undo"><IconUndo /></ToolBtn>
           <ToolBtn onClick={redo} disabled={!canRedo} title="Redo"><IconRedo /></ToolBtn>
           <ToolBtn onClick={handleSave} title="Save"><IconSave /></ToolBtn>
-          <button onClick={handleExport} className="btn btn-grey customizer__export-btn">
+          <button onClick={handleExport} className={`btn btn-grey ${exportBtnCls}`}>
             <IconExport /> Export
           </button>
-          <button onClick={handlePlaceOrder} className="btn btn-darkred customizer__export-btn">
+          <button onClick={handlePlaceOrder} className={`btn btn-darkred ${exportBtnCls}`}>
             Place Order
           </button>
         </div>
       </div>
 
-      <div className={`customizer__body${railHidden ? ' customizer__body--rail-hidden' : ''}`}>
+      <div className={bodyCls(railHidden)}>
         {/* ── Left icon rail ──────────────────────────────────── */}
         {!railHidden && (
-          <div className="customizer__rail">
+          <div className={railCls}>
             <ToolBtn active={activeTool === 'select'} onClick={() => selectTool('select', 'kit')} title="Select"><IconSelect /></ToolBtn>
             <ToolBtn active={activeTool === 'pan'} onClick={() => selectTool('pan')} title="Pan"><IconPan /></ToolBtn>
             <ToolBtn onClick={() => navigate(`/kit-editor?side=${side}`)} title="Draw"><IconDraw /></ToolBtn>
@@ -312,10 +329,10 @@ export default function Customize() {
         )}
 
         {/* ── Canvas ──────────────────────────────────────────── */}
-        <main className="customizer__canvas">
-          <div className="customizer__canvas-card">
+        <main className={canvasCls}>
+          <div className={canvasCardCls}>
             <div
-              className={`customizer__preview-wrap customizer__preview-wrap--${activeTool}`}
+              className={previewWrapCls(activeTool)}
               ref={previewRef}
               onPointerDown={handlePreviewPointerDown}
               onPointerMove={handlePreviewPointerMove}
@@ -323,11 +340,11 @@ export default function Customize() {
               onDoubleClick={resetView}
             >
               <div
-                className="customizer__preview-kit"
+                className={previewKitCls(activeTool === 'pan')}
                 style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom / 100})` }}
               >
                 {editedKitUrl ? (
-                  <img src={editedKitUrl} alt="Your edited kit" className="customizer__preview-kit-img" />
+                  <img src={editedKitUrl} alt="Your edited kit" className={previewKitImgCls} />
                 ) : (
                   <KitPreview
                     kitType={design.kitType}
@@ -356,39 +373,39 @@ export default function Customize() {
               </div>
             </div>
 
-            <div className="customizer__zoom">
-              <button onClick={() => setZoom(z => Math.max(50, z - 10))} aria-label="Zoom out"><IconMinus /></button>
-              <span>{zoom}%</span>
-              <button onClick={() => setZoom(z => Math.min(150, z + 10))} aria-label="Zoom in"><IconPlus /></button>
+            <div className={zoomCls}>
+              <button className={zoomBtnCls} onClick={() => setZoom(z => Math.max(50, z - 10))} aria-label="Zoom out"><IconMinus /></button>
+              <span className={zoomSpanCls}>{zoom}%</span>
+              <button className={zoomBtnCls} onClick={() => setZoom(z => Math.min(150, z + 10))} aria-label="Zoom in"><IconPlus /></button>
             </div>
           </div>
 
-          <div className="customizer__info-bar">
-            <span><strong>Kit:</strong> {kitLabel}</span>
-            <span><strong>Sport:</strong> {SPORTS.find(s => s.id === design.sport)?.label}</span>
-            <span><strong>Template:</strong> {DESIGN_TEMPLATES.find(t => t.id === design.template)?.name}</span>
-            <span><strong>Size:</strong> {design.size === 'Custom' && design.customSize ? `${design.customSize} ${design.customSizeUnit}` : design.size}</span>
-            <span className="customizer__color-swatch" style={{ background: design.bodyColor }} title={`Body: ${design.bodyColor}`} />
-            <span className="customizer__color-swatch" style={{ background: design.sleeveColor }} title={`Sleeves: ${design.sleeveColor}`} />
+          <div className={infoBarCls}>
+            <span><strong className="text-light-300">Kit:</strong> {kitLabel}</span>
+            <span><strong className="text-light-300">Sport:</strong> {SPORTS.find(s => s.id === design.sport)?.label}</span>
+            <span><strong className="text-light-300">Template:</strong> {DESIGN_TEMPLATES.find(t => t.id === design.template)?.name}</span>
+            <span><strong className="text-light-300">Size:</strong> {design.size === 'Custom' && design.customSize ? `${design.customSize} ${design.customSizeUnit}` : design.size}</span>
+            <span className={colorSwatchCls} style={{ background: design.bodyColor }} title={`Body: ${design.bodyColor}`} />
+            <span className={colorSwatchCls} style={{ background: design.sleeveColor }} title={`Sleeves: ${design.sleeveColor}`} />
           </div>
         </main>
 
         {/* ── Right panel ─────────────────────────────────────── */}
-        <aside className="customizer__sidebar">
-          <div className="customizer__tabs">
+        <aside className={sidebarCls}>
+          <div className={tabsCls}>
             {TABS.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`customizer__tab${activeTab === tab.id ? ' customizer__tab--active' : ''}`}
+                className={tabCls(activeTab === tab.id)}
               >
-                <span>{tab.icon}</span>
+                <span className="flex">{tab.icon}</span>
                 <span>{tab.label}</span>
               </button>
             ))}
           </div>
 
-          <div className="customizer__panel">
+          <div className={panelCls}>
             {activeTab === 'kit' && (
               <KitPanel design={design} patch={patch} initialKitSlug={searchParams.get('kit')} side={side} />
             )}
@@ -428,7 +445,7 @@ export default function Customize() {
         </aside>
       </div>
 
-      {toast && <div className="customizer__toast">{toast}</div>}
+      {toast && <div className={toastCls}>{toast}</div>}
     </div>
   );
 }
@@ -440,7 +457,7 @@ function ToolBtn({ active, disabled, onClick, title, children }) {
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`customizer__iconbtn${active ? ' customizer__iconbtn--active' : ''}`}
+      className={iconBtnCls(active)}
     >
       {children}
     </button>
@@ -462,19 +479,19 @@ function UnitDropdown({ value, onChange }) {
   }, [open]);
 
   return (
-    <div className="panel__unit-dropdown" ref={ref}>
-      <button type="button" className="panel__unit-dropdown-btn" onClick={() => setOpen(v => !v)}>
+    <div className={unitDropdownCls} ref={ref}>
+      <button type="button" className={unitDropdownBtnCls} onClick={() => setOpen(v => !v)}>
         {current?.label}
         <IconChevronLeft style={{ transform: 'rotate(-90deg)', width: 12, height: 12 }} />
       </button>
       {open && (
-        <ul className="panel__unit-dropdown-list">
+        <ul className={unitDropdownListCls}>
           {SIZE_UNITS.map(u => (
             <li key={u.id}>
               <button
                 type="button"
                 onClick={() => { onChange(u.id); setOpen(false); }}
-                className={`panel__unit-dropdown-item${u.id === value ? ' panel__unit-dropdown-item--active' : ''}`}
+                className={unitDropdownItemCls(u.id === value)}
               >
                 {u.label}
               </button>
@@ -493,17 +510,17 @@ function KitPanel({ design, patch, initialKitSlug, side }) {
   const visibleTemplates = showAllTemplates ? DESIGN_TEMPLATES : DESIGN_TEMPLATES.slice(0, 4);
 
   return (
-    <div className="panel">
-      <div className="panel__section panel__section--no-border">
-        <h3 className="panel__label">Kit Type</h3>
+    <div className={panelBoxCls}>
+      <div className={sectionCls({ first: true, noBorder: true })}>
+        <h3 className={labelCls}>Kit Type</h3>
 
         {!activeGroup ? (
-          <div className="panel__sport-grid">
+          <div className={sportGridCls}>
             {SPORT_KIT_GROUPS.map(g => (
               <button
                 key={g.id}
                 onClick={() => setExpandedSport(g.id)}
-                className="panel__sport-btn"
+                className={sportBtnCls}
               >
                 {g.label}
               </button>
@@ -511,17 +528,17 @@ function KitPanel({ design, patch, initialKitSlug, side }) {
           </div>
         ) : (
           <>
-            <button className="panel__sport-back" onClick={() => setExpandedSport(null)}>
+            <button className={sportBackCls} onClick={() => setExpandedSport(null)}>
               ← {activeGroup.label}
             </button>
-            <div className="panel__kit-grid">
+            <div className={kitGridCls}>
               {activeGroup.items.map(item => (
                 <button
                   key={item.id}
                   onClick={() => patch({ kitType: item.kitType, kitProduct: item.label })}
-                  className={`panel__kit-btn${design.kitProduct === item.label ? ' panel__kit-btn--active' : ''}`}
+                  className={kitBtnCls(design.kitProduct === item.label)}
                 >
-                  <img src={side === 'back' && item.imageBack ? item.imageBack : item.image} alt={item.label} className="panel__kit-thumb" />
+                  <img src={side === 'back' && item.imageBack ? item.imageBack : item.image} alt={item.label} className={kitThumbCls} />
                   <span>{item.label}</span>
                 </button>
               ))}
@@ -530,14 +547,14 @@ function KitPanel({ design, patch, initialKitSlug, side }) {
         )}
       </div>
 
-      <div className="panel__section panel__section--no-border">
-        <h3 className="panel__label">Templates</h3>
-        <div className="panel__template-grid">
+      <div className={sectionCls({ noBorder: true, afterNoBorder: true })}>
+        <h3 className={labelCls}>Templates</h3>
+        <div className={templateGridCls}>
           {visibleTemplates.map(t => (
             <button
               key={t.id}
               onClick={() => patch({ template: t.id })}
-              className={`panel__template-btn${design.template === t.id ? ' panel__template-btn--active' : ''}`}
+              className={templateBtnCls(design.template === t.id)}
             >
               <TemplateThumb id={t.id} base={design.bodyColor} accent={design.sleeveColor} />
               <span>{t.name}</span>
@@ -545,20 +562,20 @@ function KitPanel({ design, patch, initialKitSlug, side }) {
           ))}
         </div>
         {DESIGN_TEMPLATES.length > 4 && (
-          <button className="panel__more-btn" onClick={() => setShowAllTemplates(v => !v)}>
+          <button className={moreBtnCls} onClick={() => setShowAllTemplates(v => !v)}>
             {showAllTemplates ? 'Show less' : 'More'}
           </button>
         )}
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Size</h3>
-        <div className="panel__size-grid">
+      <div className={sectionCls({ last: true, afterNoBorder: true })}>
+        <h3 className={labelCls}>Size</h3>
+        <div className={sizeGridCls}>
           {SIZES.map(s => (
             <button
               key={s}
               onClick={() => patch({ size: s })}
-              className={`panel__size-btn${design.size === s ? ' panel__size-btn--active' : ''}`}
+              className={sizeBtnCls(design.size === s)}
             >
               {s}
             </button>
@@ -566,10 +583,10 @@ function KitPanel({ design, patch, initialKitSlug, side }) {
         </div>
         {design.size === 'Custom' && (
           <>
-            <div className="panel__custom-size-row">
+            <div className={customSizeRowCls}>
               <input
                 type="text"
-                className="panel__input"
+                className={`${inputCls} ${customSizeInputCls}`}
                 placeholder="e.g. 44 chest, or your own measurement"
                 value={design.customSize}
                 onChange={e => patch({ customSize: e.target.value })}
@@ -586,7 +603,7 @@ function KitPanel({ design, patch, initialKitSlug, side }) {
 function TemplateThumb({ id, base = '#CC0000', accent = '#1a1a1a' }) {
   const acc = accent;
   return (
-    <svg viewBox="0 0 60 70" className="panel__template-thumb">
+    <svg viewBox="0 0 60 70" className={templateThumbCls}>
       <defs>
         <linearGradient id="thumb-fade-grad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={acc} stopOpacity="0" />
@@ -635,15 +652,15 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
   const presetName = COLOR_PALETTE.find(c => c.hex.toLowerCase() === currentHex?.toLowerCase())?.name || 'Custom';
 
   return (
-    <div className="panel">
-      <div className="panel__section">
-        <h3 className="panel__label">Apply To</h3>
-        <div className="panel__segmented">
+    <div className={panelBoxCls}>
+      <div className={sectionCls({ first: true })}>
+        <h3 className={labelCls}>Apply To</h3>
+        <div className={segmentedCls}>
           {APPLY_TARGETS.map(t => (
             <button
               key={t.id}
               onClick={() => setApplyTarget(t.id)}
-              className={`panel__segment${applyTarget === t.id ? ' panel__segment--active' : ''}`}
+              className={segmentCls(applyTarget === t.id)}
             >
               {t.label}
             </button>
@@ -651,25 +668,25 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
         </div>
       </div>
 
-      <div className="panel__section">
-        <div className="panel__color-preview">
-          <span className="panel__color-preview-swatch" style={{ background: currentHex }} />
+      <div className={sectionCls()}>
+        <div className={colorPreviewCls}>
+          <span className={colorPreviewSwatchCls} style={{ background: currentHex }} />
           <div>
-            <div className="panel__color-preview-title">{targetLabel} — {presetName}</div>
-            <div className="panel__color-preview-hex">{currentHex?.toUpperCase()}</div>
+            <div className={colorPreviewTitleCls}>{targetLabel} — {presetName}</div>
+            <div className={colorPreviewHexCls}>{currentHex?.toUpperCase()}</div>
           </div>
         </div>
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Preset Colors</h3>
-        <div className="panel__palette">
+      <div className={sectionCls()}>
+        <h3 className={labelCls}>Preset Colors</h3>
+        <div className={paletteCls}>
           {COLOR_PALETTE.map(c => (
             <button
               key={c.hex}
               onClick={() => onColor(c.hex)}
-              className={`panel__swatch${currentHex?.toLowerCase() === c.hex.toLowerCase() ? ' panel__swatch--active' : ''}`}
-              style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid var(--swatch-outline)' : 'none' }}
+              className={swatchCls(currentHex?.toLowerCase() === c.hex.toLowerCase())}
+              style={{ background: c.hex, border: c.hex === '#FFFFFF' ? '1px solid var(--color-swatch-outline)' : 'none' }}
               title={c.name}
               aria-label={c.name}
             />
@@ -677,20 +694,20 @@ function ColorsPanel({ design, applyTarget, setApplyTarget, onColor, onOpacity }
         </div>
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Custom Color</h3>
+      <div className={sectionCls()}>
+        <h3 className={labelCls}>Custom Color</h3>
         <ColorPicker value={currentHex} onChange={onColor} />
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Opacity</h3>
-        <div className="panel__slider-row">
+      <div className={sectionCls({ last: true })}>
+        <h3 className={labelCls}>Opacity</h3>
+        <div className={sliderRowCls}>
           <input
             type="range" min="0" max="100" value={currentOpacity}
             onChange={e => onOpacity(Number(e.target.value))}
-            className="panel__slider"
+            className={sliderCls}
           />
-          <span className="panel__slider-value">{currentOpacity}%</span>
+          <span className={sliderValueCls}>{currentOpacity}%</span>
         </div>
       </div>
     </div>
@@ -703,79 +720,79 @@ function TextPanel({ design, patch, side, setSide }) {
   const visibleFonts = showAllFonts ? FONTS : FONTS.slice(0, 4);
 
   return (
-    <div className="panel">
-      <div className="panel__section">
-        <h3 className="panel__label">Editing Side</h3>
-        <div className="panel__segmented">
+    <div className={panelBoxCls}>
+      <div className={sectionCls({ first: true })}>
+        <h3 className={labelCls}>Editing Side</h3>
+        <div className={segmentedCls}>
           <button
             onClick={() => setSide('front')}
-            className={`panel__segment${side === 'front' ? ' panel__segment--active' : ''}`}
+            className={segmentCls(side === 'front')}
           >
             Front
           </button>
           <button
             onClick={() => setSide('back')}
-            className={`panel__segment${side === 'back' ? ' panel__segment--active' : ''}`}
+            className={segmentCls(side === 'back')}
           >
             Back
           </button>
         </div>
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Player Name</h3>
+      <div className={sectionCls()}>
+        <h3 className={labelCls}>Player Name</h3>
         <input
-          type="text" className="panel__input" placeholder="e.g. RASHFORD" maxLength={18}
+          type="text" className={inputCls} placeholder="e.g. RASHFORD" maxLength={18}
           value={design.playerName[side]}
           onChange={e => patch({ playerName: { ...design.playerName, [side]: e.target.value } })}
         />
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Squad Number</h3>
+      <div className={sectionCls()}>
+        <h3 className={labelCls}>Squad Number</h3>
         <input
-          type="text" className="panel__input" placeholder="e.g. 7" maxLength={3}
+          type="text" className={inputCls} placeholder="e.g. 7" maxLength={3}
           value={design.playerNumber[side]}
           onChange={e => patch({ playerNumber: { ...design.playerNumber, [side]: e.target.value.replace(/\D/g, '') } })}
         />
       </div>
 
-      <div className="panel__section panel__section--no-border">
-        <h3 className="panel__label">Font Style</h3>
-        <div className="panel__font-grid">
+      <div className={sectionCls({ noBorder: true })}>
+        <h3 className={labelCls}>Font Style</h3>
+        <div className={fontGridCls}>
           {visibleFonts.map(f => (
             <button
               key={f.id}
               onClick={() => patch({ font: f.id })}
-              className={`panel__font-btn${design.font === f.id ? ' panel__font-btn--active' : ''}`}
+              className={fontBtnCls(design.font === f.id)}
               style={{ fontFamily: f.id }}
             >
-              Aa <span>{f.label}</span>
+              Aa <span className={fontBtnSpanCls}>{f.label}</span>
             </button>
           ))}
         </div>
         {FONTS.length > 4 && (
-          <button className="panel__more-btn" onClick={() => setShowAllFonts(v => !v)}>
+          <button className={moreBtnCls} onClick={() => setShowAllFonts(v => !v)}>
             {showAllFonts ? 'Show less' : 'More'}
           </button>
         )}
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Text Size</h3>
+      <div className={sectionCls({ afterNoBorder: true })}>
+        <h3 className={labelCls}>Text Size</h3>
         <SliderRow label="Name" value={design.nameSize} min={8} max={30} onChange={v => patch({ nameSize: v })} />
         <SliderRow label="Number" value={design.numberSize} min={20} max={80} onChange={v => patch({ numberSize: v })} />
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Position</h3>
-        <div className="panel__pos-row">
-          <div className="panel__pos-col">
-            <span className="panel__pos-col-label">Name</span>
+      <div className={sectionCls({ last: true })}>
+        <h3 className={labelCls}>Position</h3>
+        <div className={posRowCls}>
+          <div className={posColCls}>
+            <span className={posColLabelCls}>Name</span>
             <PositionGrid value={design.textPosition} onChange={v => patch({ textPosition: v })} />
           </div>
-          <div className="panel__pos-col">
-            <span className="panel__pos-col-label">Number</span>
+          <div className={posColCls}>
+            <span className={posColLabelCls}>Number</span>
             <PositionGrid value={design.numberPosition} onChange={v => patch({ numberPosition: v })} />
           </div>
         </div>
@@ -786,10 +803,10 @@ function TextPanel({ design, patch, side, setSide }) {
 
 function SliderRow({ label, value, min, max, onChange }) {
   return (
-    <div className="panel__slider-row panel__slider-row--labeled">
-      <span className="panel__slider-label">{label}</span>
-      <input type="range" min={min} max={max} value={value} onChange={e => onChange(Number(e.target.value))} className="panel__slider" />
-      <span className="panel__slider-value">{value}</span>
+    <div className={`${sliderRowCls} ${sliderRowLabeledCls}`}>
+      <span className={sliderLabelCls}>{label}</span>
+      <input type="range" min={min} max={max} value={value} onChange={e => onChange(Number(e.target.value))} className={sliderCls} />
+      <span className={sliderValueCls}>{value}</span>
     </div>
   );
 }
@@ -803,7 +820,7 @@ function clamp(v, min, max) {
 
 function PositionGrid({ value, onChange }) {
   return (
-    <div className="panel__pos-grid">
+    <div className={posGridCls}>
       {POSITIONS.map(p => {
         const dx = p.col - 1;
         const dy = p.row - 1;
@@ -818,7 +835,7 @@ function PositionGrid({ value, onChange }) {
                 y: clamp(value.y + dy * POSITION_STEP, POSITION_BOUNDS.yMin, POSITION_BOUNDS.yMax),
               });
             }}
-            className="panel__pos-btn"
+            className={posBtnCls}
             title={isCenter ? 'Center' : `Nudge ${p.id}`}
           >
             {p.label}
@@ -832,9 +849,9 @@ function PositionGrid({ value, onChange }) {
 /* ── Draw Panel — launches the full Fabric.js kit editor ───────── */
 function DrawPanel({ side }) {
   return (
-    <div className="panel">
-      <div className="panel__section">
-        <Link to={`/kit-editor?side=${side}`} className="btn btn-grey panel__draw-studio-link">
+    <div className={panelBoxCls}>
+      <div className={sectionCls({ first: true, last: true })}>
+        <Link to={`/kit-editor?side=${side}`} className={`btn btn-grey ${drawStudioLinkCls}`}>
           Open kit editor →
         </Link>
       </div>
@@ -847,23 +864,23 @@ function AssetsPanel({ design, patch, fileInputRef, onFile }) {
   const [dragOver, setDragOver] = useState(false);
 
   return (
-    <div className="panel">
-      <div className="panel__section">
-        <h3 className="panel__label">Upload Logo / Badge</h3>
+    <div className={panelBoxCls}>
+      <div className={sectionCls({ first: true })}>
+        <h3 className={labelCls}>Upload Logo / Badge</h3>
         <div
-          className={`panel__dropzone${dragOver ? ' panel__dropzone--over' : ''}`}
+          className={dropzoneCls(dragOver)}
           onClick={() => fileInputRef.current?.click()}
           onDragOver={e => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={e => { e.preventDefault(); setDragOver(false); onFile(e.dataTransfer.files?.[0]); }}
         >
           {design.logoDataUrl ? (
-            <img src={design.logoDataUrl} alt="Uploaded logo" className="panel__dropzone-preview" />
+            <img src={design.logoDataUrl} alt="Uploaded logo" className={dropzonePreviewCls} />
           ) : (
             <>
               <IconUpload />
-              <p>Click to upload or drag &amp; drop</p>
-              <span>PNG, SVG, JPG · Max 5MB</span>
+              <p className="text-[12px] font-semibold">Click to upload or drag &amp; drop</p>
+              <span className="text-[10px] text-light-600">PNG, SVG, JPG · Max 5MB</span>
             </>
           )}
           <input
@@ -872,35 +889,35 @@ function AssetsPanel({ design, patch, fileInputRef, onFile }) {
           />
         </div>
         {design.logoDataUrl && (
-          <button className="panel__link-btn" onClick={() => patch({ logoDataUrl: null })}>Remove logo</button>
+          <button className={linkBtnCls} onClick={() => patch({ logoDataUrl: null })}>Remove logo</button>
         )}
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Badge Presets</h3>
-        <div className="panel__pill-row">
+      <div className={sectionCls()}>
+        <h3 className={labelCls}>Badge Presets</h3>
+        <div className={pillRowCls}>
           {BADGE_PRESETS.map(b => (
             <button
               key={b.id}
               onClick={() => patch({ logoPreset: b.id, logoDataUrl: null })}
-              className={`panel__badge-btn${design.logoPreset === b.id && !design.logoDataUrl ? ' panel__badge-btn--active' : ''}`}
+              className={badgeBtnCls(design.logoPreset === b.id && !design.logoDataUrl)}
               title={b.label}
             >
-              <img src={b.image} alt={b.label} className="panel__badge-thumb" />
+              <img src={b.image} alt={b.label} className={badgeThumbCls} />
               {b.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Logo Size</h3>
+      <div className={sectionCls()}>
+        <h3 className={labelCls}>Logo Size</h3>
         <SliderRow label="Scale" value={design.logoScale} min={30} max={150} onChange={v => patch({ logoScale: v })} />
         <SliderRow label="Opacity" value={design.logoOpacity} min={0} max={100} onChange={v => patch({ logoOpacity: v })} />
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Logo Position</h3>
+      <div className={sectionCls({ last: true })}>
+        <h3 className={labelCls}>Logo Position</h3>
         <PositionGrid value={design.logoPosition} onChange={v => patch({ logoPosition: v })} />
       </div>
     </div>
@@ -910,26 +927,26 @@ function AssetsPanel({ design, patch, fileInputRef, onFile }) {
 /* ── Layers Panel ───────────────────────────────────────────── */
 function LayersPanel({ design, toggleLayer, reorderLayers, dragLayerId, setDragLayerId }) {
   return (
-    <div className="panel">
-      <div className="panel__section">
-        <h3 className="panel__label">Layer Stack</h3>
-        <div className="panel__layer-list">
+    <div className={panelBoxCls}>
+      <div className={sectionCls({ first: true })}>
+        <h3 className={labelCls}>Layer Stack</h3>
+        <div className={layerListCls}>
           {design.layerOrder.map(id => {
             const meta = DEFAULT_LAYER_ORDER.find(l => l.id === id);
             const visible = design.layers[id];
             return (
               <div
                 key={id}
-                className={`panel__layer-row${dragLayerId === id ? ' panel__layer-row--dragging' : ''}`}
+                className={layerRowCls(dragLayerId === id)}
                 draggable
                 onDragStart={() => setDragLayerId(id)}
                 onDragOver={e => e.preventDefault()}
                 onDrop={() => { reorderLayers(dragLayerId, id); setDragLayerId(null); }}
                 onDragEnd={() => setDragLayerId(null)}
               >
-                <span className="panel__layer-grip"><IconGrip /></span>
-                <span className={`panel__layer-name${visible ? '' : ' panel__layer-name--hidden'}`}>{meta?.label}</span>
-                <button className="panel__layer-eye" onClick={() => toggleLayer(id)} aria-label={`Toggle ${meta?.label}`}>
+                <span className={layerGripCls}><IconGrip /></span>
+                <span className={layerNameCls(!visible)}>{meta?.label}</span>
+                <button className={layerEyeCls} onClick={() => toggleLayer(id)} aria-label={`Toggle ${meta?.label}`}>
                   {visible ? <IconEye /> : <IconEyeOff />}
                 </button>
               </div>
@@ -938,9 +955,9 @@ function LayersPanel({ design, toggleLayer, reorderLayers, dragLayerId, setDragL
         </div>
       </div>
 
-      <div className="panel__section">
-        <h3 className="panel__label">Design State</h3>
-        <div className="panel__state-box">
+      <div className={sectionCls({ last: true })}>
+        <h3 className={labelCls}>Design State</h3>
+        <div className={stateBoxCls}>
           <StateRow label="Kit" value={design.kitProduct || KIT_TYPES.find(k => k.id === design.kitType)?.label} />
           <StateRow label="Sport" value={SPORTS.find(s => s.id === design.sport)?.label} />
           <StateRow label="Template" value={DESIGN_TEMPLATES.find(t => t.id === design.template)?.name} />
@@ -955,10 +972,10 @@ function LayersPanel({ design, toggleLayer, reorderLayers, dragLayerId, setDragL
 
 function StateRow({ label, value, swatch }) {
   return (
-    <div className="panel__state-row">
-      <span>{label}</span>
-      <span className="panel__state-value">
-        {swatch && <i className="panel__state-swatch" style={{ background: swatch }} />}
+    <div className={stateRowCls}>
+      <span className={stateRowLabelCls}>{label}</span>
+      <span className={stateValueCls}>
+        {swatch && <i className={stateSwatchCls} style={{ background: swatch }} />}
         {value}
       </span>
     </div>

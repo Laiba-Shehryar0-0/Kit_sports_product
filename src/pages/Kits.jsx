@@ -1,26 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import cricketShirtImg from '../assets/cricket-shirt.png';
+import cricketShirtImg from '../assets/cricket-shirt-front.png';
 import cricketTrousersImg from '../assets/cricket-trousers-front.png';
-import cricketSweaterImg from '../assets/cricket-sweater.png';
-import footballJerseyImg from '../assets/football-jersey.png';
+import cricketSweaterImg from '../assets/cricket-sweater-front.png';
+import footballJerseyImg from '../assets/football-jersey-front.png';
 import footballShortsImg from '../assets/football-shorts-front.png';
 import goalkeeperKitImg from '../assets/goalkeeperkit-front.png';
 import basketballJerseyImg from '../assets/basketball-jersey-front.png';
 import basketballShortsImg from '../assets/basketball-shorts-front.png';
-import trainingTShirtImg from '../assets/training-T-shit.png';
+import trainingTShirtImg from '../assets/training-T-shit-front.png';
 import trainingShortsImg from '../assets/training-shorts-front.png';
 import trainingVestImg from '../assets/training-vest-front.png';
 import cricketCapImg from '../assets/cricket-cap.png';
-import basketballShoesImg from '../assets/basketball-shoes.png';
+import basketballHeadbandImg from '../assets/basketball-headband.png';
 import trainingBibImg from '../assets/training-bib-front.png';
 import warmupSuitImg from '../assets/warmup-suit-front.png';
 import tracksuitImg from '../assets/tracksuit-front.png';
 import boxingKitImg from '../assets/boxing-kit.png';
-import hockeyKitImg from '../assets/hockey-kit.png';
+import hockeyKitImg from '../assets/hockey-kit-front.png';
 import cyclingKitImg from '../assets/cycling-kit-front.png';
 import rugbyKitImg from '../assets/rugby-kit-front.png';
-import './Kits.css';
 
 const ALL_KITS = [
   { id: 1,  slug: 'cricket-shirt',    emoji: '🏏', image: cricketShirtImg, name: 'Cricket Shirt',       sport: 'cricket',    desc: 'Premium cotton-poly blend cricket shirt with classic fit.', color: '#1a3a1a' },
@@ -32,7 +31,7 @@ const ALL_KITS = [
   { id: 7,  slug: 'basketball-jersey', emoji: '🏀', image: basketballJerseyImg, name: 'Basketball Jersey',   sport: 'basketball', desc: 'Mesh-panelled basketball jersey for maximum breathability.', color: '#0a1a3a' },
   { id: 8,  slug: 'basketball-shorts', emoji: '🏀', image: basketballShortsImg, name: 'Basketball Shorts',   sport: 'basketball', desc: 'Loose-fit basketball shorts with drawstring.', color: '#1a3a1a' },
   { id: 9,  slug: 'training-tshirt',  emoji: '💪', image: trainingTShirtImg, name: 'Training T-Shirt',    sport: 'training',   desc: 'Comfortable training tee in moisture-wicking fabric.', color: '#4a0010' },
-  { id: 10, slug: 'basketball-shoes', emoji: '👟', image: basketballShoesImg, name: 'Basketball Shoes',   sport: 'basketball', desc: 'High-performance basketball shoes with ankle support.', color: '#4a0010' },
+  { id: 10, slug: 'basketball-headband', emoji: '🎗️', image: basketballHeadbandImg, name: 'Basketball Headband',   sport: 'basketball', desc: 'Sweat-wicking headband to keep you focused on the game.', color: '#4a0010' },
   { id: 11, slug: 'training-shorts',  emoji: '🩳', image: trainingShortsImg, name: 'Training Shorts',     sport: 'training',   desc: 'Lightweight training shorts with reflective trim.', color: '#2a2a2a' },
   { id: 12, slug: 'training-vest',    emoji: '🦺', image: trainingVestImg, name: 'Training Vest',       sport: 'training',   desc: 'Mesh training vest for team practice drills.', color: '#3a2a1a' },
   { id: 13, slug: 'cricket-cap',      emoji: '🧢', image: cricketCapImg, name: 'Cricket Cap',        sport: 'cricket',    desc: 'Classic cricket cap with adjustable fit.', color: '#1a3a1a' },
@@ -68,41 +67,37 @@ export default function Kits() {
     ? [...filtered].sort((a, b) => SPORT_ORDER.indexOf(a.sport) - SPORT_ORDER.indexOf(b.sport))
     : filtered;
 
-  const firstOfSport = new Set();
-  const visibleWithTag = visible.map(kit => {
-    const showTag = !firstOfSport.has(kit.sport);
-    if (showTag) firstOfSport.add(kit.sport);
-    return { ...kit, showTag };
-  });
-
   return (
-    <div className="kits-page">
-      <div className="kits-page__hero">
-        <div className="container">
+    <div className="min-h-screen bg-bg-800 pt-[72px]">
+      <div className="bg-bg-900 pt-16 pb-12 border-b border-border-dark">
+        <div className="container flex flex-col items-start gap-4">
           <h1 className="section-title">Our Sports Kits</h1>
-          <p className="section-subtitle">
+          <p className="section-subtitle whitespace-nowrap">
             Premium quality kits for every sport. All customizable to your team's identity.
           </p>
         </div>
       </div>
 
-      <div className="container kits-page__main">
+      <div className="container pt-10 pb-16">
         {/* Controls */}
-        <div className="kits-page__controls">
-          <div className="kits-page__filters">
-            {SPORTS.map(s => (
-              <button
-                key={s}
-                onClick={() => setFilter(s.toLowerCase())}
-                className={`kits-page__filter${filter === s.toLowerCase() ? ' kits-page__filter--active' : ''}`}
-              >
-                {s}
-              </button>
-            ))}
+        <div className="flex items-center justify-between gap-5 mb-5 flex-wrap max-[768px]:flex-col max-[768px]:items-start">
+          <div className="flex gap-2 flex-wrap">
+            {SPORTS.map(s => {
+              const isActive = filter === s.toLowerCase();
+              return (
+                <button
+                  key={s}
+                  onClick={() => setFilter(s.toLowerCase())}
+                  className={`py-2 px-5 text-[11px] font-bold tracking-[1.5px] uppercase border-[1.5px] cursor-pointer rounded-[6px] transition-[all_200ms_ease] active:translate-y-0 hover:text-light-100 hover:border-light-400 hover:bg-bg-500 hover:-translate-y-px hover:shadow-[0_3px_8px_rgba(0,0,0,0.25)] ${isActive ? 'bg-red text-light-100 border-red shadow-[0_4px_12px_rgba(204,0,0,0.35)]' : 'bg-bg-600 text-light-500 border-border-dark'}`}
+                >
+                  {s}
+                </button>
+              );
+            })}
           </div>
           <input
             type="search"
-            className="kits-page__search"
+            className="py-[10px] px-5 bg-bg-600 border border-border-dark text-light-100 text-[0.875rem] w-[260px] outline-none transition-[border-color_150ms_ease] rounded-none placeholder:text-light-600 focus:border-red max-[768px]:w-full"
             placeholder="Search kits..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -110,21 +105,21 @@ export default function Kits() {
         </div>
 
         {/* Count */}
-        <p className="kits-page__count">
-          Showing <strong>{visible.length}</strong> kit{visible.length !== 1 ? 's' : ''}
+        <p className="text-[0.875rem] text-light-600 mb-8">
+          Showing <strong className="text-light-300">{visible.length}</strong> kit{visible.length !== 1 ? 's' : ''}
         </p>
 
         {/* Grid */}
-        <div className="kits-page__grid">
-          {visibleWithTag.map(kit => (
-            <KitDetailCard key={kit.id} kit={kit} showTag={kit.showTag} />
+        <div className="grid grid-cols-4 gap-5 max-[1024px]:grid-cols-3 max-[768px]:grid-cols-2 max-[480px]:grid-cols-1">
+          {visible.map(kit => (
+            <KitDetailCard key={kit.id} kit={kit} />
           ))}
         </div>
 
         {visible.length === 0 && (
-          <div className="kits-page__empty">
-            <span>🔍</span>
-            <p>No kits found. Try adjusting your filters.</p>
+          <div className="text-center py-20 flex flex-col items-center gap-4">
+            <span className="text-[3rem]">🔍</span>
+            <p className="text-light-500 text-base">No kits found. Try adjusting your filters.</p>
           </div>
         )}
       </div>
@@ -132,24 +127,29 @@ export default function Kits() {
   );
 }
 
-function KitDetailCard({ kit, showTag }) {
+function KitDetailCard({ kit }) {
   return (
-    <div className="kit-detail-card" style={{ '--kit-color': kit.color }}>
-      <div className="kit-detail-card__image">
+    <div
+      className="bg-bg-600 border border-border-dark rounded-[12px] overflow-hidden transition-[transform_250ms_ease,box-shadow_250ms_ease,border-color_250ms_ease] hover:-translate-y-[5px] hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)] hover:border-border-medium"
+      style={{ '--kit-color': kit.color }}
+    >
+      <div className="relative aspect-[1.2] bg-bg-700 flex items-center justify-center">
         {kit.image
-          ? <img src={kit.image} alt={kit.name} className="kit-detail-card__img" />
-          : <span className="kit-detail-card__emoji">{kit.emoji}</span>
+          ? <img src={kit.image} alt={kit.name} className="w-[175px] h-[175px] object-contain" />
+          : <span className="text-[3.5rem] [filter:drop-shadow(0_4px_12px_rgba(0,0,0,0.4))]">{kit.emoji}</span>
         }
-        {showTag && <span className="kit-detail-card__sport">{kit.sport}</span>}
       </div>
-      <div className="kit-detail-card__body">
-        <h3 className="kit-detail-card__name">{kit.name}</h3>
-        <p className="kit-detail-card__desc">{kit.desc}</p>
-        <div className="kit-detail-card__actions">
-          <Link to={`/customize?kit=${kit.slug}`} className="btn btn-red kit-detail-card__btn">
+      <div className="p-5 flex flex-col gap-3">
+        <h3 className="text-[15px] font-bold text-light-100">{kit.name}</h3>
+        <p className="text-[0.8rem] text-light-500 leading-[1.65]">{kit.desc}</p>
+        <div className="flex gap-2 flex-wrap mt-2">
+          <Link to={`/customize?kit=${kit.slug}`} className="btn btn-red py-2 px-4 text-[10px] flex-1 justify-center">
             Customize
           </Link>
-          <Link to="/#contact" className="btn kit-detail-card__btn kit-detail-card__btn--quote">
+          <Link
+            to="/#contact"
+            className="btn py-2 px-4 text-[10px] flex-1 justify-center bg-transparent border-[1.5px] border-light-600 text-light-100 hover:border-[#bbbbbb] hover:bg-[rgba(255,255,255,0.06)]"
+          >
             Get Quote
           </Link>
         </div>
