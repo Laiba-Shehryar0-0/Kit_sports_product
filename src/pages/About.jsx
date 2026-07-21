@@ -18,15 +18,15 @@ const VALUES = [
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-bg-800 pt-[72px]">
+    <div className="min-h-screen bg-surface-800 pt-[72px]">
       {/* Hero */}
-      <div className="relative bg-bg-900 pt-20 pb-16 border-b border-border-dark overflow-hidden">
+      <div className="relative bg-surface-900 pt-10 pb-16 border-b border-line overflow-hidden">
         <div className="container flex flex-col items-start gap-5 relative z-[1]">
           <h1 className="section-title max-w-[640px]">
             Crafting Champions'<br />Kits Since 2025
           </h1>
           <p className="section-subtitle">
-            Based in Islamabad, Kit Lab has been outfitting teams with premium custom sportswear since 2025.
+            Based in Islamabad, Sports Hub has been outfitting teams with premium custom sportswear since 2025.
           </p>
         </div>
         <div
@@ -36,7 +36,7 @@ export default function About() {
       </div>
 
       {/* Mission */}
-      <section className="bg-light-100 py-24">
+      <section className="bg-light-100 pt-12 pb-24">
         <div className="container grid grid-cols-[1.3fr_1fr] gap-16 items-center max-[1024px]:grid-cols-1">
           <div className="flex flex-col items-start gap-5">
             <h2 className="section-title section-title--dark">
@@ -73,7 +73,7 @@ export default function About() {
       </section>
 
       {/* Values */}
-      <section className="bg-bg-800 py-24">
+      <section className="bg-surface-800 py-24">
         <div className="container">
           <div className="flex flex-col gap-4 mb-12 text-center items-center">
             <h2 className="section-title">What Drives Us</h2>
@@ -82,10 +82,10 @@ export default function About() {
             {VALUES.map(({ title, desc }) => (
               <div
                 key={title}
-                className="bg-bg-600 border border-border-dark py-8 px-6 text-center transition-[border-color_250ms_ease,transform_250ms_ease] hover:border-border-medium hover:-translate-y-1"
+                className="bg-surface-600 border border-line py-8 px-6 text-center transition-[border-color_250ms_ease,transform_250ms_ease] hover:border-line-strong hover:-translate-y-1"
               >
-                <h3 className="text-[14px] font-bold tracking-[1px] uppercase text-light-100 mb-3">{title}</h3>
-                <p className="text-[0.85rem] text-light-500 leading-[1.7]">{desc}</p>
+                <h3 className="text-[14px] font-bold tracking-[1px] uppercase text-onsurface-100 mb-3">{title}</h3>
+                <p className="text-[0.85rem] text-onsurface-500 leading-[1.7]">{desc}</p>
               </div>
             ))}
           </div>

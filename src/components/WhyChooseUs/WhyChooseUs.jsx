@@ -38,7 +38,7 @@ export default function WhyChooseUs() {
           ref={headerRef}
         >
           <h2 className="section-title section-title--dark">
-            Why Choose Kit Lab
+            Why Choose Sports Hub
           </h2>
           <p className="section-subtitle section-subtitle--dark whitespace-nowrap">
             Experience the perfect blend of quality, customization, and passion in every kit

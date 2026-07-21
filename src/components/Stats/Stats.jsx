@@ -21,9 +21,8 @@ export default function Stats() {
             className={`group flex flex-col items-center gap-2 py-8 px-4 rounded-[16px] bg-[linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))] border border-[rgba(255,255,255,0.06)] relative overflow-hidden cursor-default transition-[transform_0.3s_ease,border-color_0.3s_ease,background_0.3s_ease] hover:-translate-y-1.5 before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-0.5 before:bg-[linear-gradient(90deg,transparent,var(--color-red),var(--color-gold),transparent)] before:opacity-0 before:transition-[opacity_0.3s_ease] anim-fade-up delay-${i + 1}${visible ? ' is-visible' : ''}`}
             style={{ '--i': i }}
           >
-            <span className="[font-family:'Bebas_Neue',var(--font-display)] text-[clamp(2.8rem,4.5vw,4rem)] tracking-[3px] leading-none text-light-100 transition-[transform_0.3s_ease] group-hover:scale-[1.08]">{value}</span>
+            <span className="[font-family:'Bebas_Neue',var(--font-display)] text-[clamp(2.2rem,3.6vw,3.2rem)] tracking-[3px] leading-none text-light-100 transition-[transform_0.3s_ease] group-hover:scale-[1.08]">{value}</span>
             <span className="text-[11px] font-bold tracking-[2.5px] uppercase text-[rgba(255,255,255,0.45)] text-center">{label}</span>
-            <div className="mt-2 w-8 h-0.5 rounded-[2px] bg-[linear-gradient(90deg,var(--color-red),var(--color-gold))] transition-[width_0.3s_ease] group-hover:w-14" />
           </div>
         ))}
       </div>

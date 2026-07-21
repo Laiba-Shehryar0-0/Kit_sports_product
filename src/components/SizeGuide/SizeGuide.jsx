@@ -29,7 +29,7 @@ const STEPS = [
 export default function SizeGuide() {
   return (
     <section className="grid grid-cols-2 min-h-[580px]">
-      <div className="bg-bg-900 flex items-center">
+      <div className="bg-surface-900 flex items-center">
         <div className="py-16 px-12 max-w-[600px] m-auto w-full flex flex-col items-start justify-center gap-10 max-[900px]:py-12 max-[900px]:px-6 max-[900px]:max-w-full max-[900px]:m-0">
           <h2 className="section-title">Size Guide</h2>
 
@@ -37,16 +37,16 @@ export default function SizeGuide() {
             <table className="w-full border-collapse text-[0.875rem]">
               <thead>
                 <tr>
-                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Size</th>
-                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Chest (in)</th>
-                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Waist (in)</th>
-                  <th className="bg-bg-600 text-light-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-border-dark">Length (in)</th>
+                  <th className="bg-surface-600 text-onsurface-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-line">Size</th>
+                  <th className="bg-surface-600 text-onsurface-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-line">Chest (in)</th>
+                  <th className="bg-surface-600 text-onsurface-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-line">Waist (in)</th>
+                  <th className="bg-surface-600 text-onsurface-500 text-[10px] font-bold tracking-[1.5px] uppercase py-3 px-4 text-left border-b border-line">Length (in)</th>
                 </tr>
               </thead>
               <tbody>
                 {SIZES.map(({ size, chest, waist, length }, i) => {
                   const isLast = i === SIZES.length - 1;
-                  const tdCls = `py-3 px-4 text-light-300 group-hover:bg-bg-600${isLast ? '' : ' border-b border-border-dark'}`;
+                  const tdCls = `py-3 px-4 text-onsurface-300 group-hover:bg-surface-600${isLast ? '' : ' border-b border-line'}`;
                   return (
                     <tr key={size} className="group">
                       <td className={tdCls}>{size}</td>

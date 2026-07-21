@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo-mark.png';
 import { IconEye, IconEyeOff } from '../../customize/icons';
+import { required, email as emailRule, minLength, pattern, matches, validateFields } from '../../utils/validation';
 
-const fieldInputCls = 'bg-bg-600 border border-border-dark text-light-100 py-[10px] px-4 text-[0.9rem] outline-none transition-[border-color_150ms_ease,box-shadow_150ms_ease] w-full rounded-[8px] placeholder:text-light-600 focus:border-border-medium';
+const fieldInputCls = 'bg-surface-600 border border-line text-onsurface-100 py-[10px] px-4 text-[0.9rem] outline-none transition-[border-color_150ms_ease,box-shadow_150ms_ease] w-full rounded-[8px] placeholder:text-onsurface-600 focus:border-line-strong';
 
 export default function AuthModal() {
-  const { authModal, closeModal, signIn, signUp } = useAuth();
+  const { authModal, closeModal, signIn, signUp, loading, error: authError, setError: setAuthError } = useAuth();
   const { open, tab: initialTab } = authModal;
 
   const [tab,      setTab]      = useState(initialTab);
@@ -15,19 +16,20 @@ export default function AuthModal() {
   const [password, setPassword] = useState('');
   const [confirm,  setConfirm]  = useState('');
   const [showPwd,  setShowPwd]  = useState(false);
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const [validationError, setValidationError] = useState('');
+  const error = validationError || authError;
   const firstInputRef = useRef(null);
 
   // Sync tab when modal opens from outside
   useEffect(() => {
     if (open) {
       setTab(initialTab);
-      setError('');
+      setValidationError('');
+      setAuthError('');
       setName(''); setEmail(''); setPassword(''); setConfirm('');
       setTimeout(() => firstInputRef.current?.focus(), 80);
     }
-  }, [open, initialTab]);
+  }, [open, initialTab, setAuthError]);
 
   // Close on Escape
   useEffect(() => {
@@ -45,43 +47,52 @@ export default function AuthModal() {
 
   const switchTab = (t) => {
     setTab(t);
-    setError('');
+    setValidationError('');
+    setAuthError('');
     setName(''); setEmail(''); setPassword(''); setConfirm('');
   };
 
-  const validateEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  const SIGNUP_SCHEMA = {
+    name: [required('Full name is required.')],
+    email: [required('Email address is required.'), emailRule()],
+    password: [
+      required('Password is required.'),
+      minLength(6, 'Password must be at least 6 characters.'),
+      pattern(/[A-Z]/, 'Password must contain at least one uppercase letter.'),
+      pattern(/[0-9]/, 'Password must contain at least one number.'),
+    ],
+    confirm: [matches(v => v.password, 'Passwords do not match.')],
+  };
+  const SIGNIN_SCHEMA = {
+    email: [required('Email address is required.'), emailRule()],
+    password: [required('Password is required.'), minLength(6, 'Password must be at least 6 characters.')],
+  };
+  const SIGNIN_FIELD_ORDER = ['email', 'password'];
+  const SIGNUP_FIELD_ORDER = ['name', 'email', 'password', 'confirm'];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setValidationError('');
+    setAuthError('');
 
-    if (!email.trim())              return setError('Email address is required.');
-    if (!validateEmail(email))      return setError('Please enter a valid email address.');
-    if (!password)                  return setError('Password is required.');
+    const isSignup = tab === 'signup';
+    const fieldErrors = validateFields(
+      { name, email, password, confirm },
+      isSignup ? SIGNUP_SCHEMA : SIGNIN_SCHEMA,
+    );
+    const firstError = (isSignup ? SIGNUP_FIELD_ORDER : SIGNIN_FIELD_ORDER)
+      .map(f => fieldErrors[f]).find(Boolean);
+    if (firstError) return setValidationError(firstError);
 
-    if (tab === 'signup') {
-      if (!name.trim())             return setError('Full name is required.');
-      if (password.length < 6)      return setError('Password must be at least 6 characters.');
-      if (!/[A-Z]/.test(password))  return setError('Password must contain at least one uppercase letter.');
-      if (!/[0-9]/.test(password))  return setError('Password must contain at least one number.');
-      if (password !== confirm)     return setError('Passwords do not match.');
-    } else {
-      if (password.length < 6)      return setError('Password must be at least 6 characters.');
-    }
-
-    setLoading(true);
     try {
-      await new Promise(r => setTimeout(r, 600)); // simulate network
       if (tab === 'signin') {
-        signIn(email, password);
+        await signIn(email, password);
       } else {
-        signUp(name.trim(), email, password);
+        await signUp(name.trim(), email, password);
       }
       closeModal();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } catch {
+      // error message is already set on the auth context
     }
   };
 
@@ -93,30 +104,30 @@ export default function AuthModal() {
       onClick={(e) => e.target === e.currentTarget && closeModal()}
     >
       <div
-        className="bg-bg-700 border-none rounded-[14px] w-full max-w-[440px] max-h-[90vh] overflow-y-auto py-6 px-8 relative animate-[modalIn_220ms_cubic-bezier(0.34,1.56,0.64,1)] shadow-[0_24px_80px_rgba(0,0,0,0.7)] max-[480px]:py-8 max-[480px]:px-5"
+        className="bg-surface-700 border-none rounded-[14px] w-full max-w-[440px] max-h-[90vh] overflow-y-auto py-6 px-8 relative animate-[modalIn_220ms_cubic-bezier(0.34,1.56,0.64,1)] shadow-[0_24px_80px_rgba(0,0,0,0.7)] max-[480px]:py-8 max-[480px]:px-5"
         role="dialog" aria-modal="true" aria-label={tab === 'signin' ? 'Sign in' : 'Create account'}
       >
         {/* Close button */}
         <button
-          className="absolute top-5 right-5 bg-bg-500 border border-border-dark text-light-500 w-8 h-8 flex items-center justify-center text-[12px] cursor-pointer rounded-full transition-[all_220ms_ease] hover:bg-red hover:border-red hover:text-light-100 hover:rotate-90 hover:scale-110 hover:shadow-[0_4px_12px_rgba(204,0,0,0.4)] active:rotate-90 active:scale-95"
+          className="absolute top-5 right-5 bg-surface-500 border border-line text-onsurface-500 w-8 h-8 flex items-center justify-center text-[12px] cursor-pointer rounded-full transition-[all_220ms_ease] hover:bg-red hover:border-red hover:text-light-100 hover:rotate-90 hover:scale-110 hover:shadow-[0_4px_12px_rgba(204,0,0,0.4)] active:rotate-90 active:scale-95"
           onClick={closeModal} aria-label="Close"
         >✕</button>
 
         {/* Brand */}
         <div className="flex items-center justify-center gap-3 mb-3">
-          <img src={logo} alt="Kit Lab" className="h-[52px] w-auto object-contain" />
+          <img src={logo} alt="Sports Hub" className="h-[52px] w-auto object-contain" />
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-border-dark mb-4">
+        <div className="flex border-b border-line mb-4">
           <button
-            className={`flex-1 py-2 px-4 text-[13px] font-bold tracking-[0.5px] bg-transparent border-none cursor-pointer border-b-2 transition-[color_150ms_ease,border-color_150ms_ease] -mb-px hover:text-light-100 ${tab === 'signin' ? 'text-light-100 border-b-light-100' : 'text-light-600 border-b-transparent'}`}
+            className={`flex-1 py-2 px-4 text-[13px] font-bold tracking-[0.5px] bg-transparent border-none cursor-pointer border-b-2 transition-[color_150ms_ease,border-color_150ms_ease] -mb-px hover:text-onsurface-100 ${tab === 'signin' ? 'text-onsurface-100 border-b-onsurface-100' : 'text-onsurface-600 border-b-transparent'}`}
             onClick={() => switchTab('signin')}
           >
             Sign in
           </button>
           <button
-            className={`flex-1 py-2 px-4 text-[13px] font-bold tracking-[0.5px] bg-transparent border-none cursor-pointer border-b-2 transition-[color_150ms_ease,border-color_150ms_ease] -mb-px hover:text-light-100 ${tab === 'signup' ? 'text-light-100 border-b-light-100' : 'text-light-600 border-b-transparent'}`}
+            className={`flex-1 py-2 px-4 text-[13px] font-bold tracking-[0.5px] bg-transparent border-none cursor-pointer border-b-2 transition-[color_150ms_ease,border-color_150ms_ease] -mb-px hover:text-onsurface-100 ${tab === 'signup' ? 'text-onsurface-100 border-b-onsurface-100' : 'text-onsurface-600 border-b-transparent'}`}
             onClick={() => switchTab('signup')}
           >
             Create account
@@ -126,7 +137,7 @@ export default function AuthModal() {
         <form className="flex flex-col gap-3" onSubmit={handleSubmit} noValidate>
           {tab === 'signup' && (
             <div className="flex flex-col gap-[6px]">
-              <label htmlFor="auth-name" className="text-[11px] font-bold tracking-[0.3px] text-light-500">Full name</label>
+              <label htmlFor="auth-name" className="text-[11px] font-bold tracking-[0.3px] text-onsurface-500">Full name</label>
               <input
                 id="auth-name"
                 ref={tab === 'signup' ? firstInputRef : null}
@@ -142,7 +153,7 @@ export default function AuthModal() {
           )}
 
           <div className="flex flex-col gap-[6px]">
-            <label htmlFor="auth-email" className="text-[11px] font-bold tracking-[0.3px] text-light-500">Email address</label>
+            <label htmlFor="auth-email" className="text-[11px] font-bold tracking-[0.3px] text-onsurface-500">Email address</label>
             <input
               id="auth-email"
               ref={tab === 'signin' ? firstInputRef : null}
@@ -157,7 +168,7 @@ export default function AuthModal() {
           </div>
 
           <div className="flex flex-col gap-[6px]">
-            <label htmlFor="auth-password" className="text-[11px] font-bold tracking-[0.3px] text-light-500">Password</label>
+            <label htmlFor="auth-password" className="text-[11px] font-bold tracking-[0.3px] text-onsurface-500">Password</label>
             <div className="relative">
               <input
                 id="auth-password"
@@ -171,7 +182,7 @@ export default function AuthModal() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center bg-transparent border-none cursor-pointer p-0 text-light-500 transition-[color_150ms_ease] hover:text-light-100"
+                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center bg-transparent border-none cursor-pointer p-0 text-onsurface-500 transition-[color_150ms_ease] hover:text-onsurface-100"
                 onClick={() => setShowPwd(v => !v)}
                 aria-label={showPwd ? 'Hide password' : 'Show password'}
               >
@@ -182,7 +193,7 @@ export default function AuthModal() {
 
           {tab === 'signup' && (
             <div className="flex flex-col gap-[6px]">
-              <label htmlFor="auth-confirm" className="text-[11px] font-bold tracking-[0.3px] text-light-500">Confirm password</label>
+              <label htmlFor="auth-confirm" className="text-[11px] font-bold tracking-[0.3px] text-onsurface-500">Confirm password</label>
               <input
                 id="auth-confirm"
                 type={showPwd ? 'text' : 'password'}
@@ -197,7 +208,7 @@ export default function AuthModal() {
           )}
 
           {error && (
-            <p className="text-[0.8rem] text-[#ff6b6b] bg-[rgba(255,107,107,0.1)] border border-[rgba(255,107,107,0.25)] py-3 px-4 leading-[1.5]" role="alert">
+            <p className="text-[0.8rem] text-danger bg-[rgba(255,107,107,0.1)] border border-[rgba(255,107,107,0.25)] py-3 px-4 leading-[1.5]" role="alert">
               ⚠ {error}
             </p>
           )}
@@ -212,14 +223,14 @@ export default function AuthModal() {
               : tab === 'signin' ? 'Sign in' : 'Create account'}
           </button>
 
-          <p className="text-center text-[0.8rem] text-light-600">
+          <p className="text-center text-[0.8rem] text-onsurface-600">
             {tab === 'signin' ? (
               <>Don't have an account?{' '}
-                <button type="button" onClick={() => switchTab('signup')} className="bg-transparent border-none text-light-100 cursor-pointer [font-size:inherit] font-semibold p-0 underline underline-offset-2 hover:text-gold-dark">Sign up free</button>
+                <button type="button" onClick={() => switchTab('signup')} className="bg-transparent border-none text-onsurface-100 cursor-pointer [font-size:inherit] font-semibold p-0 underline underline-offset-2 hover:text-gold-dark">Sign up free</button>
               </>
             ) : (
               <>Already have an account?{' '}
-                <button type="button" onClick={() => switchTab('signin')} className="bg-transparent border-none text-light-100 cursor-pointer [font-size:inherit] font-semibold p-0 underline underline-offset-2 hover:text-gold-dark">Sign in</button>
+                <button type="button" onClick={() => switchTab('signin')} className="bg-transparent border-none text-onsurface-100 cursor-pointer [font-size:inherit] font-semibold p-0 underline underline-offset-2 hover:text-gold-dark">Sign in</button>
               </>
             )}
           </p>

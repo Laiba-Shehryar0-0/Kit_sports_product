@@ -381,10 +381,10 @@ export default function Customize() {
           </div>
 
           <div className={infoBarCls}>
-            <span><strong className="text-light-300">Kit:</strong> {kitLabel}</span>
-            <span><strong className="text-light-300">Sport:</strong> {SPORTS.find(s => s.id === design.sport)?.label}</span>
-            <span><strong className="text-light-300">Template:</strong> {DESIGN_TEMPLATES.find(t => t.id === design.template)?.name}</span>
-            <span><strong className="text-light-300">Size:</strong> {design.size === 'Custom' && design.customSize ? `${design.customSize} ${design.customSizeUnit}` : design.size}</span>
+            <span><strong className="text-onsurface-300">Kit:</strong> {kitLabel}</span>
+            <span><strong className="text-onsurface-300">Sport:</strong> {SPORTS.find(s => s.id === design.sport)?.label}</span>
+            <span><strong className="text-onsurface-300">Template:</strong> {DESIGN_TEMPLATES.find(t => t.id === design.template)?.name}</span>
+            <span><strong className="text-onsurface-300">Size:</strong> {design.size === 'Custom' && design.customSize ? `${design.customSize} ${design.customSizeUnit}` : design.size}</span>
             <span className={colorSwatchCls} style={{ background: design.bodyColor }} title={`Body: ${design.bodyColor}`} />
             <span className={colorSwatchCls} style={{ background: design.sleeveColor }} title={`Sleeves: ${design.sleeveColor}`} />
           </div>
@@ -880,7 +880,7 @@ function AssetsPanel({ design, patch, fileInputRef, onFile }) {
             <>
               <IconUpload />
               <p className="text-[12px] font-semibold">Click to upload or drag &amp; drop</p>
-              <span className="text-[10px] text-light-600">PNG, SVG, JPG · Max 5MB</span>
+              <span className="text-[10px] text-onsurface-600">PNG, SVG, JPG · Max 5MB</span>
             </>
           )}
           <input

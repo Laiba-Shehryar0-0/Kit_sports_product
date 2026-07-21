@@ -1,13 +1,16 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
+import { login, register, logout as logoutRequest } from '../api/authService';
+import { getToken } from '../api/token';
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = 'kws_user';
+const USER_KEY = 'kws_user';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!getToken()) return null;
+      const stored = localStorage.getItem(USER_KEY);
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
@@ -15,41 +18,51 @@ export function AuthProvider({ children }) {
   });
 
   const [authModal, setAuthModal] = useState({ open: false, tab: 'signin' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const openSignIn  = useCallback(() => setAuthModal({ open: true, tab: 'signin' }),  []);
   const openSignUp  = useCallback(() => setAuthModal({ open: true, tab: 'signup' }),  []);
   const closeModal  = useCallback(() => setAuthModal(prev => ({ ...prev, open: false })), []);
 
-  const signIn = useCallback((email, password) => {
-    // Lookup from registered users stored in localStorage
-    const registered = JSON.parse(localStorage.getItem('kws_users') || '[]');
-    const found = registered.find(u => u.email === email && u.password === password);
-    if (!found) throw new Error('Invalid email or password.');
-    const { password: _, ...safe } = found;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
-    setUser(safe);
+  const signIn = useCallback(async (email, password) => {
+    setLoading(true);
+    setError('');
+    try {
+      const safeUser = await login(email, password);
+      localStorage.setItem(USER_KEY, JSON.stringify(safeUser));
+      setUser(safeUser);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const signUp = useCallback((name, email, password) => {
-    const registered = JSON.parse(localStorage.getItem('kws_users') || '[]');
-    if (registered.some(u => u.email === email)) {
-      throw new Error('An account with this email already exists.');
+  const signUp = useCallback(async (name, email, password) => {
+    setLoading(true);
+    setError('');
+    try {
+      const safeUser = await register(name, email, password);
+      localStorage.setItem(USER_KEY, JSON.stringify(safeUser));
+      setUser(safeUser);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
     }
-    const newUser = { id: Date.now(), name, email, password, avatar: name.charAt(0).toUpperCase() };
-    registered.push(newUser);
-    localStorage.setItem('kws_users', JSON.stringify(registered));
-    const { password: _, ...safe } = newUser;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(safe));
-    setUser(safe);
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
+    logoutRequest();
+    localStorage.removeItem(USER_KEY);
     setUser(null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signUp, logout, openSignIn, openSignUp, closeModal, authModal }}>
+    <AuthContext.Provider value={{ user, signIn, signUp, logout, openSignIn, openSignUp, closeModal, authModal, loading, error, setError }}>
       {children}
     </AuthContext.Provider>
   );

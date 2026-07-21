@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { hasPickedDesign } from './customize/kitShapes';
 import AuthModal  from './components/AuthModal/AuthModal';
 import Navbar     from './components/Navbar/Navbar';
@@ -47,48 +48,40 @@ function AppFooter() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <ScrollToTop />
-        <Navbar />
-        <AuthModal />
-        <Routes>
-          <Route path="/"          element={<Home />} />
-          <Route path="/kits"      element={<Kits />} />
-          <Route path="/customize" element={<Customize />} />
-          <Route path="/draw-studio" element={
-            <Suspense fallback={<PageLoading />}>
-              <DrawStudio />
-            </Suspense>
-          } />
-          <Route path="/kit-editor" element={
-            <Suspense fallback={<PageLoading />}>
-              <KitEditor />
-            </Suspense>
-          } />
-          <Route path="/checkout"  element={<CheckoutGuard />} />
-          <Route path="/about"     element={<About />} />
-          <Route path="/contact"   element={<Contact />} />
-          <Route path="*"          element={<NotFound />} />
-        </Routes>
-        <AppFooter />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ScrollToTop />
+          <Navbar />
+          <AuthModal />
+          <Routes>
+            <Route path="/"          element={<Home />} />
+            <Route path="/kits"      element={<Kits />} />
+            <Route path="/customize" element={<Customize />} />
+            <Route path="/draw-studio" element={
+              <Suspense fallback={<PageLoading />}>
+                <DrawStudio />
+              </Suspense>
+            } />
+            <Route path="/kit-editor" element={
+              <Suspense fallback={<PageLoading />}>
+                <KitEditor />
+              </Suspense>
+            } />
+            <Route path="/checkout"  element={<CheckoutGuard />} />
+            <Route path="/about"     element={<About />} />
+            <Route path="/contact"   element={<Contact />} />
+            <Route path="*"          element={<NotFound />} />
+          </Routes>
+          <AppFooter />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
 
 function PageLoading() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingTop: '72px',
-      background: 'var(--color-bg-800)',
-      color: 'var(--color-light-500)',
-      fontSize: '13px',
-      letterSpacing: '0.5px',
-    }}>
+    <div className="min-h-screen flex items-center justify-center pt-[72px] bg-surface-800 text-onsurface-500 text-[13px] tracking-[0.5px]">
       Loading…
     </div>
   );
@@ -96,22 +89,11 @@ function PageLoading() {
 
 function NotFound() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingTop: '72px',
-      gap: '16px',
-      background: 'var(--color-bg-800)',
-      color: 'var(--color-light-100)',
-      textAlign: 'center',
-    }}>
-      <span style={{ fontSize: '4rem' }}>🏆</span>
-      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '4rem', letterSpacing: '4px' }}>404</h1>
-      <p style={{ color: 'var(--color-light-500)' }}>Page not found.</p>
-      <a href="/" style={{ color: 'var(--color-gold)' }}>← Back to Home</a>
+    <div className="min-h-screen flex flex-col items-center justify-center pt-[72px] gap-4 bg-surface-800 text-onsurface-100 text-center">
+      <span className="text-[4rem]">🏆</span>
+      <h1 className="font-display text-[4rem] tracking-[4px]">404</h1>
+      <p className="text-onsurface-500">Page not found.</p>
+      <a href="/" className="text-gold">← Back to Home</a>
     </div>
   );
 }

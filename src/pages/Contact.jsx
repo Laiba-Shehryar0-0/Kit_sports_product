@@ -2,7 +2,7 @@ import ContactSection from '../components/ContactSection/ContactSection';
 
 export default function Contact() {
   return (
-    <main style={{ paddingTop: '72px', background: 'var(--color-bg-800)', minHeight: '100vh' }}>
+    <main className="pt-[72px] bg-surface-800 min-h-screen">
       <ContactSection />
     </main>
   );
