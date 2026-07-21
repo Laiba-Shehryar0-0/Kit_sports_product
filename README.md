@@ -1,4 +1,4 @@
-# Kit World Sports
+# Sports Hub
 
 A React + Vite frontend for browsing, viewing, and customizing sports kits (jerseys, shorts, tracksuits, hoodies, caps) with a live SVG preview.
 
